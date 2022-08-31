@@ -1,4 +1,4 @@
-# VMDサイジング
+# VMD Sizing
 
 
 ## Dependencies
@@ -9,3 +9,4 @@
  - [bezier](https://pypi.org/project/bezier/)
 
 
+All copyright is belonged to miu200521358
