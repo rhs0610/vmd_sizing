@@ -4,6 +4,8 @@ from module.MMath import MRect, MVector2D, MVector3D, MVector4D, MQuaternion, MM
 from utils.MLogger import MLogger # noqa
 import numpy as np
 cimport numpy as np
+import ctypes
+
 import bezier
 cimport bezier._curve
 
@@ -130,7 +132,7 @@ cpdef np.ndarray calc_value_from_catmullrom(str bone_name, list fnos, list value
         return y_intpol
     except Exception as e:
         # エラーレベルは落として表に出さない
-        logger.debug("カトマル曲線値生成失敗", e)
+        logger.debug("카토마루 곡선값 생성 실패", e)
         return np.empty(1)
 
 
@@ -142,9 +144,9 @@ def join_value_2_bezier(fno: int, bone_name: str, values: list, offset=0, diff_l
 cdef tuple c_join_value_2_bezier(int fno, str bone_name, list values, double offset, double diff_limit):
     if len(values) <= 2:
         # 次数が1の場合、線形補間
-        logger.debug("次数1: values: %s", values)
+        logger.debug("차수 1: values: %s", values)
         return (LINEAR_MMD_INTERPOLATION, [])
-    
+
     cdef np.ndarray[np.double_t, ndim=1] xs, yx
     cdef np.ndarray[np.float_t, ndim=1] bz_x, bz_y, reduce_bz_x, reduce_bz_y, bezier_x, diff_ys, full_ys, reduced_ys, diff_large
     cdef np.ndarray[np.float_t, ndim=2] nodes
@@ -164,7 +166,7 @@ cdef tuple c_join_value_2_bezier(int fno, str bone_name, list values, double off
 
         if len(bz_x) == 0:
             # 始点と終点が指定されていて、カトマル曲線が描けなかった場合、線形補間
-            logger.debug("カトマル曲線失敗: bz_x: %s", bz_x)
+            logger.debug("카토마루 곡선 실패: bz_x: %s", bz_x)
             return (LINEAR_MMD_INTERPOLATION, [])
 
         # 次数
@@ -189,7 +191,7 @@ cdef tuple c_join_value_2_bezier(int fno, str bone_name, list values, double off
             bz_x = full_curve.nodes[0]
             bz_y = full_curve.nodes[1]
             logger.test("START bz_x: %s, bz_y: %s", bz_x, bz_y)
-            
+
             # 3次になるまでベジェ曲線を繋いで減らしていく
             while len(bz_x) > 4:
                 reduced_curve_list = []
@@ -205,7 +207,7 @@ cdef tuple c_join_value_2_bezier(int fno, str bone_name, list values, double off
                         reduced_curve = reduced_curve.reduce_()
 
                     logger.test("n: %s, nodes: %s", n, reduced_curve.nodes)
-                    
+
                     # リストに追加
                     reduced_curve_list.append(reduced_curve)
 
@@ -243,7 +245,7 @@ cdef tuple c_join_value_2_bezier(int fno, str bone_name, list values, double off
 
         # 差が大きい箇所をピックアップする
         diff_large = np.where(np.abs(diff_ys) > (diff_limit * (offset + 1)), 1, 0).astype(np.float)
-        
+
         # 差が一定未満である場合、ベジェ曲線をMMD補間曲線に合わせる
         nodes = joined_curve.nodes
 
@@ -262,7 +264,7 @@ cdef tuple c_join_value_2_bezier(int fno, str bone_name, list values, double off
             # 補間曲線がMMD補間曲線内に収まらない場合、NG
 
             # 差分の大きなところを返す
-            diff_large = np.where(np.abs(diff_ys) > (diff_limit * 0.5 * (offset + 1)), 1, 0).astype(np.float)            
+            diff_large = np.where(np.abs(diff_ys) > (diff_limit * 0.5 * (offset + 1)), 1, 0).astype(np.float)
             if np.count_nonzero(diff_large) > 0:
                 return (None, np.where(diff_large)[0].tolist())
 
@@ -272,15 +274,15 @@ cdef tuple c_join_value_2_bezier(int fno, str bone_name, list values, double off
                 return (None, np.where(diff_large)[0].tolist())
 
             return (None, [])
-        
+
         # オフセット込みの場合、MMD用補間曲線枠内に収める
         fit_bezier_mmd(joined_bz)
-        
+
         # すべてクリアした場合、補間曲線採用
         return (joined_bz, [])
     except Exception as e:
         # エラーレベルは落として表に出さない
-        logger.debug("ベジェ曲線生成失敗", e)
+        logger.debug("베지에 곡선 생성 실패", e)
         return (None, [])
 
 
@@ -320,7 +322,7 @@ cdef tuple convert_catmullrom_2_bezier(np.ndarray xs, np.ndarray ys):
             # p0が空の場合、始点
             B = (p1 * (1 / 2)) - p2 + (p3 * (1 / 2))
             C = (p1 * (-3 / 2)) + (p2 * 2) - (p3 * (1 / 2))
-        
+
         if p0 and not p3:
             # p3が空の場合、終点
             B = (p0 * (1 / 2)) - p1 + (p2 * (1 / 2))
@@ -330,14 +332,14 @@ cdef tuple convert_catmullrom_2_bezier(np.ndarray xs, np.ndarray ys):
             # それ以外は通過点
             B = p0 - (p1 * (5 / 2)) + (p2 * (4 / 2)) - (p3 * (1 / 2))
             C = (p0 * (-1 / 2)) + (p2 * (1 / 2))
-        
+
         if not B or not C:
             logger.warning("p0: %s, p1: %s, p2: %s, p3: %s", p0, p1, p2, p3)
 
         # ベジェ曲線の制御点
         s1 = (C + (p1 * 3)) / 3
         s2 = (B - (p1 * 3) + (s1 * 6)) / 3
-        
+
         bz_x.append(s1.x())
         bz_x.append(s2.x())
 
@@ -369,14 +371,14 @@ cdef np.ndarray intersect_by_x(curve, np.ndarray xs):
 
         # 評価する
         es = curve.evaluate_multi(s_vals)
-        
+
         # 値が取れている場合、その値を設定する
         if es.shape == (2, 1):
             ys.append(es[1][0])
         # 取れていない場合、無視
         else:
             ys.append(0)
-    
+
     return np.array(ys, dtype=np.float)
 
 
@@ -392,10 +394,10 @@ def evaluate(x1v: int, y1v: int, x2v: int, y2v: int, start: int, now: int, end: 
 cdef tuple c_evaluate(int x1v, int y1v, int x2v, int y2v, int start, int now, int end):
     if (now - start) == 0 or (end - start) == 0:
         return (0, 0, 0)
-    
+
     cdef double x, x1, x2, y1, y2, t, s, ft, y
     cdef int i
-        
+
     x = (now - start) / (end - start)
     x1 = x1v / INTERPOLATION_MMD_MAX
     x2 = x2v / INTERPOLATION_MMD_MAX
@@ -415,7 +417,7 @@ cdef tuple c_evaluate(int x1v, int y1v, int x2v, int y2v, int start, int now, in
             t -= 1 / (4 << i)
         else:
             t += 1 / (4 << i)
-        
+
         s = 1 - t
 
     y = (3 * (s * s) * t * y1) + (3 * s * (t * t) * y2) + (t * t * t)
@@ -434,7 +436,7 @@ cdef tuple c_evaluate_by_t(int x1v, int y1v, int x2v, int y2v, int start, int en
     if (end - start) <= 1:
         # 差が1以内の場合、終了
         return (start, 0, t)
-    
+
     cdef double x1, x2, y1, y2
     cdef int fno
 
@@ -451,7 +453,7 @@ cdef tuple c_evaluate_by_t(int x1v, int y1v, int x2v, int y2v, int start, int en
 
     # xに相当するフレーム番号
     fno = int(round_integer(start + ((end - start) * es[0, 0])))
-    
+
     return (fno, es[1, 0], t)
 
 
@@ -562,6 +564,6 @@ cdef MVector2D round_bezier_mmd(MVector2D target):
 cdef int round_integer(double t):
     # 一旦整数部にまで持ち上げる
     cdef double t2 = t * 1000000
-    
+
     # pythonは偶数丸めなので、整数部で丸めた後、元に戻す
     return round(round(t2, -6) / 1000000)
