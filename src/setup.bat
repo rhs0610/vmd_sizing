@@ -11,3 +11,5 @@ rem -- ’Êí—p
 python setup.py build_ext --inplace
 
 cd ..
+
+pause

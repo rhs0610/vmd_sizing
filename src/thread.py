@@ -10,10 +10,10 @@ class SimpleThread(threading.Thread):
         self.acallable = acallable
         self._result = None
         super(SimpleThread, self).__init__()
-    
+
     def run(self):
         self._result = self.acallable()
-    
+
     def result(self):
         return self._result
 
@@ -38,8 +38,8 @@ class Frame(wx.Frame):
         wx.Frame.__init__(self, parent, id, title, size=(380, 200))
 
         sizer_1 = wx.BoxSizer(wx.HORIZONTAL)
-        self.csv_btn_ctrl = wx.Button(self, wx.ID_ANY, u"CSV変換実行", wx.DefaultPosition, wx.Size(200, 50), 0)
-        self.csv_btn_ctrl.SetToolTip(u"VMDをCSVに変換します。")
+        self.csv_btn_ctrl = wx.Button(self, wx.ID_ANY, u"CSV 변환 실행", wx.DefaultPosition, wx.Size(200, 50), 0)
+        self.csv_btn_ctrl.SetToolTip(u"VMD를 CSV로 변환합니다.。")
         self.csv_btn_ctrl.Bind(wx.EVT_BUTTON, self.OnButton)
         sizer_1.Add(self.csv_btn_ctrl, 0, wx.ALL, 5)
 

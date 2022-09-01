@@ -31,7 +31,7 @@ class MyFrame(wx.Frame):
           sizer_5 = wx.BoxSizer(wx.VERTICAL)
           sizer_4 = wx.BoxSizer(wx.VERTICAL)
           sizer_3 = wx.BoxSizer(wx.VERTICAL)
-          label_69 = wx.StaticText(self, wx.ID_ANY, "　　＊＊　マウス右ダブルクリックで該当色(r, g, b)をクリップボードにコピー　＊＊")
+          label_69 = wx.StaticText(self, wx.ID_ANY, "　　** 마우스 오른쪽 더블 클릭으로 해당 색상(r,g,b)을 클립보드에 복사**")
           sizer_1.Add(label_69, 0, wx.ALL | wx.EXPAND, 1)
           label_70 = wx.StaticText(
                self, wx.ID_ANY, "AQUAMARINE", style=wx.ALIGN_CENTER)
@@ -381,7 +381,7 @@ class MyFrame(wx.Frame):
           self.SetSizer(sizer_1)
           sizer_1.Fit(self)
           self.Layout()
-          
+
 # end of class MyFrame
 class MyApp(wx.App):
      def OnInit(self):

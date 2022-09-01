@@ -36,9 +36,9 @@ if __name__ == '__main__':
         try:
             SizingService(MOptions.parse(VERSION_NAME)).execute()
         except SizingException as se:
-            print("サイジング処理が処理できないデータで終了しました。\n\n%s", se.message)
+            print("사이징 처리가 처리할 수 없는 데이터로 종료되었습니다.\n\n%s", se.message)
         except Exception:
-            print("サイジング処理が意図せぬエラーで終了しました。")
+            print("사이징 처리가 의도치 않은 오류로 종료되었습니다.")
             print(traceback.format_exc())
         finally:
             logging.shutdown()
@@ -56,7 +56,7 @@ if __name__ == '__main__':
         parser.add_argument("--out_log", default=0, type=int)
         parser.add_argument("--is_saving", default=1, type=int)
         args = parser.parse_args()
-        
+
         # ロギングレベル
         is_out_log = True if args.out_log == 1 else False
         # 省エネモード
@@ -67,22 +67,22 @@ if __name__ == '__main__':
         log_level_name = ""
         if args.verbose == MLogger.FULL:
             # フルデータの場合
-            log_level_name = "（全打ち版）"
+            log_level_name = "（전타 판）"
         elif args.verbose == MLogger.DEBUG_FULL:
             # フルデータの場合
-            log_level_name = "（全打ちデバッグ版）"
+            log_level_name = "（전타 디버그 판）"
         elif args.verbose == MLogger.DEBUG:
             # テスト（デバッグ版）の場合
-            log_level_name = "（デバッグ版）"
+            log_level_name = "(디버그 판）"
         elif args.verbose == MLogger.TIMER:
             # 時間計測の場合
-            log_level_name = "（タイマー版）"
+            log_level_name = "（타이머 판）"
         elif not is_saving:
             # 省エネOFFの場合
-            log_level_name = "（ハイスペック版）"
+            log_level_name = "（하이스펙 판）"
         elif is_out_log:
             # ログありの場合
-            log_level_name = "（ログあり版）"
+            log_level_name = "（로그 있는 판）"
 
         now_version_name = "{0}{1}".format(VERSION_NAME, log_level_name)
 

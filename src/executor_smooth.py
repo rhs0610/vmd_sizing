@@ -27,9 +27,9 @@ if __name__ == "__main__":
 
         ConvertSmoothService(options).execute()
     except SizingException as se:
-        print("スムージング処理が処理できないデータで終了しました。\n\n%s", se.message)
+        print("스무딩 처리가 불가능한 데이터로 종료되었습니다.\n\n%s", se.message)
     except Exception:
-        print("スムージング処理が意図せぬエラーで終了しました。")
+        print("스무딩 처리가 의도치 않은 오류로 종료되었습니다.")
         print(traceback.format_exc())
     finally:
         logging.shutdown()
