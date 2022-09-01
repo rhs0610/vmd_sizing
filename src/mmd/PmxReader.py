@@ -44,7 +44,7 @@ class PmxReader:
 
             if signature[:3] != b"PMX" or (version != 2.0 and version != 2.1):
                 # 整合性チェック
-                raise MParseException("PMX2.0/2.1形式外のデータです。signature: {0}, version: {1} ".format(signature, version))
+                raise MParseException("PMX2.0/2.1형식 외의 데이터입니다.signature: {0}, version: {1} ".format(signature, version))
 
             # flag
             flag_bytes = self.read_int(1)
@@ -118,7 +118,7 @@ class PmxReader:
 
                 if signature[:3] != b"PMX" or (version != 2.0 and version != 2.1):
                     # 整合性チェック
-                    raise MParseException("PMX2.0/2.1形式外のデータです。signature: {0}, version: {1} ".format(signature, version))
+                    raise MParseException("PMX2.0/2.1형식 외의 데이터입니다.signature: {0}, version: {1} ".format(signature, version))
 
                 # flag
                 flag_bytes = self.read_int(1)
@@ -202,13 +202,13 @@ class PmxReader:
                         if bone_idx not in pmx.vertices:
                             pmx.vertices[bone_idx] = []
                         pmx.vertices[bone_idx].append(vertex)
-                    
+
                     # 全頂点データとしても保持
                     pmx.vertex_dict[vertex.index] = vertex
-                    
+
                 logger.test("len(vertices): %s", len(pmx.vertices))
                 logger.test("vertices.keys: %s", pmx.vertices.keys())
-                logger.info("-- PMX 頂点読み込み完了")
+                logger.info("-- PMX 정점 읽기 완료")
 
                 # 面データリスト
                 for iidx in range(self.read_int(4)):
@@ -217,17 +217,17 @@ class PmxReader:
                         pmx.indices[index_idx] = []
 
                     pmx.indices[index_idx].append(self.read_vertex_index_size(self.vertex_index_size))
-                    
+
                 logger.test("len(indices): %s", len(pmx.indices))
-                
-                logger.info("-- PMX 面読み込み完了")
+
+                logger.info("-- PMX 화면 읽기 완료")
 
                 # テクスチャデータリスト
                 for _ in range(self.read_int(4)):
                     pmx.textures.append(self.read_text())
                 logger.test("len(textures): %s", len(pmx.textures))
 
-                logger.info("-- PMX テクスチャ読み込み完了")
+                logger.info("-- PMX 텍스쳐 읽기 완료")
 
                 # 全面データの件数
                 total_index_count = 0
@@ -264,17 +264,17 @@ class PmxReader:
                     # 頂点を材質の頂点数を元に割り振る
                     if material.name not in pmx.material_indices:
                         pmx.material_indices[material.name] = []
-                        
+
                     if material.name not in pmx.material_vertices:
                         pmx.material_vertices[material.name] = []
-                    
+
                     logger.test("material.vertex_count: %s: %s total: %s", material.name, material.vertex_count, total_index_count)
 
                     for iidx in range(total_index_count, total_index_count + (material.vertex_count // 3)):
                         pmx.material_indices[material.name].append(iidx)
                         for iiidx in pmx.indices[iidx]:
                             pmx.material_vertices[material.name].append(iiidx)
-                
+
                     # 全面数加算
                     total_index_count += (material.vertex_count // 3)
 
@@ -282,8 +282,8 @@ class PmxReader:
                     pmx.material_indices[material.index] = material.name
                 logger.test("len(materials): %s", len(pmx.materials))
 
-                logger.info("-- PMX 材質読み込み完了")
-                
+                logger.info("-- PMX 재질 읽기 완료")
+
                 pmx.bones = {}
                 pmx.bone_indexes = {}
 
@@ -362,11 +362,11 @@ class PmxReader:
                         pmx.bone_indexes[bone.index] = bone.name
                     else:
                         # 既に同じボーン名がある場合、処理がおかしくなるので乱数追加
-                        logger.warning("ボーン名が重複しているため、後のボーンを無視します。\nモデル: %s\n重複ボーン名: %s(%s - %s)" % (pmx.name, bone.name, pmx.bones[bone.name].index, bone_idx), decoration=MLogger.DECORATION_BOX)     # noqa
+                        logger.warning("본 이름이 중복되어 뒤의 본을 무시합니다.\n모델 : %s\n중복 본명: %s(%s - %s)" % (pmx.name, bone.name, pmx.bones[bone.name].index, bone_idx), decoration=MLogger.DECORATION_BOX)     # noqa
                         # 乱数追加してボーンリストにだけ追加
                         pmx.bones[bone.name + randomname(3)] = bone
                         # INDEX逆引きは登録しない（同名のを優先させる）
-                
+
                 if self.is_sizing:
                     # サイジング用ボーン ---------
                     if "頭" in pmx.bones:
@@ -385,19 +385,19 @@ class PmxReader:
                             right_sole_vertex = Vertex(-1, MVector3D(pmx.bones["右足先EX"].position.x(), 0, pmx.bones["右足先EX"].position.z()), MVector3D(), MVector2D(), [], Bdef1(-1), -1)
                         elif "右足ＩＫ" in pmx.bones:
                             right_sole_vertex = pmx.get_sole_vertex("右")
-                        
+
                         if right_sole_vertex:
                             pmx.right_sole_vertex = right_sole_vertex
                             right_sole_bone = Bone("右足底実体", "right sole entity", right_sole_vertex.position.copy(), -1, 0, 0, is_sizing=True)
                             right_sole_bone.index = len(pmx.bones.keys())
-                            
+
                             if "右足先EX" in pmx.bones:
                                 right_sole_bone.parent_index = pmx.bones["右足先EX"].index
                                 right_sole_bone.layer = pmx.bones["右足先EX"].layer
                             else:
                                 right_sole_bone.parent_index = pmx.bones["右足ＩＫ"].index
                                 right_sole_bone.layer = pmx.bones["右足ＩＫ"].layer
-                            
+
                             logger.debug("右足底実体: %s, parent: %s(%s)", right_sole_bone.index, right_sole_bone.parent_index, pmx.bone_indexes[right_sole_bone.parent_index])
 
                             pmx.bones[right_sole_bone.name] = right_sole_bone
@@ -410,12 +410,12 @@ class PmxReader:
                             left_sole_vertex = Vertex(-1, MVector3D(pmx.bones["左足先EX"].position.x(), 0, pmx.bones["左足先EX"].position.z()), MVector3D(), MVector2D(), [], Bdef1(-1), -1)
                         elif "左足ＩＫ" in pmx.bones:
                             left_sole_vertex = pmx.get_sole_vertex("左")
-                        
+
                         if left_sole_vertex:
                             pmx.left_sole_vertex = left_sole_vertex
                             left_sole_bone = Bone("左足底実体", "left sole entity", left_sole_vertex.position.copy(), -1, 0, 0, is_sizing=True)
                             left_sole_bone.index = len(pmx.bones.keys())
-                            
+
                             if "左足先EX" in pmx.bones:
                                 left_sole_bone.parent_index = pmx.bones["左足先EX"].index
                                 left_sole_bone.layer = pmx.bones["左足先EX"].layer
@@ -445,7 +445,7 @@ class PmxReader:
                                 right_toe_bone.parent_index = pmx.bones["右つま先ＩＫ"].index
                                 right_toe_bone.layer = pmx.bones["右つま先ＩＫ"].layer
 
-                            logger.debug("右つま先実体: %s, parent: %s(%s)", right_toe_bone.index, right_toe_bone.parent_index, pmx.bone_indexes[right_toe_bone.parent_index])
+                            logger.debug("오른쪽 발끝 실체: %s, parent: %s(%s)", right_toe_bone.index, right_toe_bone.parent_index, pmx.bone_indexes[right_toe_bone.parent_index])
 
                             pmx.bones[right_toe_bone.name] = right_toe_bone
                             pmx.bone_indexes[right_toe_bone.index] = right_toe_bone.name
@@ -467,7 +467,7 @@ class PmxReader:
                                 left_toe_bone.parent_index = pmx.bones["左つま先ＩＫ"].index
                                 left_toe_bone.layer = pmx.bones["左つま先ＩＫ"].layer
 
-                            logger.debug("左つま先実体: %s, parent: %s(%s)", left_toe_bone.index, left_toe_bone.parent_index, pmx.bone_indexes[left_toe_bone.parent_index])
+                            logger.debug("왼쪽 발끝 실체: %s, parent: %s(%s)", left_toe_bone.index, left_toe_bone.parent_index, pmx.bone_indexes[left_toe_bone.parent_index])
 
                             pmx.bones[left_toe_bone.name] = left_toe_bone
                             pmx.bone_indexes[left_toe_bone.index] = left_toe_bone.name
@@ -491,17 +491,17 @@ class PmxReader:
                         neck_base_bone.index = len(pmx.bones.keys())
                         pmx.bones[neck_base_bone.name] = neck_base_bone
                         pmx.bone_indexes[neck_base_bone.index] = neck_base_bone.name
-                        
+
                         if "左肩P" in pmx.bones:
                             pmx.bones["左肩P"].parent_index = neck_base_bone.index
                         else:
                             pmx.bones["左肩"].parent_index = neck_base_bone.index
-                        
+
                         if "右肩P" in pmx.bones:
                             pmx.bones["右肩P"].parent_index = neck_base_bone.index
                         else:
                             pmx.bones["右肩"].parent_index = neck_base_bone.index
-                        
+
                     # 首根元2ボーン
                     if "左腕" in pmx.bones and "右腕" in pmx.bones:
                         neck_base2_vertex = Vertex(-1, (pmx.bones["左腕"].position + pmx.bones["右腕"].position) / 2, MVector3D(), MVector2D(), [], Bdef1(-1), -1)
@@ -705,7 +705,7 @@ class PmxReader:
                         leg_center_bone.index = len(pmx.bones.keys())
                         pmx.bones[leg_center_bone.name] = leg_center_bone
                         pmx.bone_indexes[leg_center_bone.index] = leg_center_bone.name
-                    
+
                     # # ボーンの並び替え
                     # tmp_bones = {}
                     # tmp_bone_indexes = {}
@@ -740,7 +740,7 @@ class PmxReader:
                     # ボーンの長さを計算する
                     self.calc_bone_length(pmx.bones, pmx.bone_indexes)
 
-                logger.info("-- PMX ボーン読み込み完了")
+                logger.info("-- PMX 본 읽기 완료")
 
                 # 操作パネル (PMD:カテゴリ) 1:眉(左下) 2:目(左上) 3:口(右上) 4:その他(右下)
                 morphs_by_panel = {}
@@ -811,7 +811,7 @@ class PmxReader:
 
                 logger.test("len(morphs): %s", len(pmx.morphs))
 
-                logger.info("-- PMX モーフ読み込み完了")
+                logger.info("-- PMX 모프 읽기 완료")
 
                 # 表示枠データリスト
                 for _ in range(self.read_int(4)):
@@ -847,7 +847,7 @@ class PmxReader:
 
                 logger.test("len(display_slots): %s", len(pmx.display_slots))
 
-                logger.info("-- PMX 表示枠読み込み完了")
+                logger.info("-- PMX 표시 범위 읽기 완료")
 
                 # 剛体データリスト
                 for rigidbody_idx in range(self.read_int(4)):
@@ -883,7 +883,7 @@ class PmxReader:
 
                 logger.test("len(rigidbodies): %s", len(pmx.rigidbodies))
 
-                logger.info("-- PMX 剛体読み込み完了")
+                logger.info("-- PMX 강체 읽기 완료")
 
                 # ジョイントデータリスト
                 for joint_idx in range(self.read_int(4)):
@@ -907,7 +907,7 @@ class PmxReader:
 
                 logger.test("len(joints): %s", len(pmx.joints))
 
-                logger.info("-- PMX ジョイント読み込み完了")
+                logger.info("-- PMX 관절 읽기 완료")
 
             # ハッシュを設定
             pmx.digest = self.hexdigest()
@@ -927,13 +927,13 @@ class PmxReader:
             # 終了命令
             raise ke
         except SizingException as se:
-            logger.error("Pmx読み込み処理が処理できないデータで終了しました。\n\n%s", se.message, decoration=MLogger.DECORATION_BOX)
+            logger.error("Pmx 읽기 처리가 처리할 수 없는 데이터로 종료했습니다.\n\n%s", se.message, decoration=MLogger.DECORATION_BOX)
             return se
         except Exception as e:
             import traceback
-            logger.error("Pmx読み込み処理が意図せぬエラーで終了しました。\n\n%s", traceback.format_exc(), decoration=MLogger.DECORATION_BOX)
+            logger.error("Pmx 읽기 처리가 의도치 않은 오류로 종료되었습니다.\n\n%s", traceback.format_exc(), decoration=MLogger.DECORATION_BOX)
             raise e
-    
+
     def sort_bones(self, pmx, tmp_bones, tmp_bone_indexes, bone_index, is_ik, index):
         for bk, bv in tmp_bones.items():
             if bv.getIkFlag() == is_ik and (bv.parent_index == bone_index or bv.name not in pmx.bones):
@@ -1156,7 +1156,7 @@ class PmxReader:
                 return bresult.decode("UTF8")
             return read_text
         else:
-            raise MParseException("define_read_text 定義エラー {0}".format(text_encoding))
+            raise MParseException("define_read_text 정의 에러 {0}".format(text_encoding))
 
     # 頂点INDEXの解凍（サイズに基づく）
     def define_read_vertex_idx(self, vertex_size):
@@ -1169,7 +1169,7 @@ class PmxReader:
                 return self.read_int(vertex_size)
             return read_vertex_idx
         else:
-            raise MParseException("define_read_vertex_idx 定義エラー {0}".format(vertex_size))
+            raise MParseException("define_read_vertex_idx 정의 에러 {0}".format(vertex_size))
 
     # 整数の解凍
     def read_int(self, format_size):
@@ -1180,7 +1180,7 @@ class PmxReader:
         elif format_size == 4:
             format_type = "i"
         else:
-            raise MParseException("read_int format_sizeエラー {0}".format(format_size))
+            raise MParseException("read_int format_size에러 {0}".format(format_size))
 
         return int(self.unpack(format_size, format_type))
 
@@ -1193,7 +1193,7 @@ class PmxReader:
         elif format_size == 4:
             format_type = "I"
         else:
-            raise MParseException("read_uint format_sizeエラー {0}".format(format_size))
+            raise MParseException("read_uint format_size에러 {0}".format(format_size))
 
         return int(self.unpack(format_size, format_type))
 
@@ -1204,7 +1204,7 @@ class PmxReader:
         elif format_size == 8:
             format_type = "d"
         else:
-            raise MParseException("read_float format_sizeエラー {0}".format(format_size))
+            raise MParseException("read_float format_size에러 {0}".format(format_size))
 
         return float(self.unpack(format_size, format_type))
 

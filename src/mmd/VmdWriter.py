@@ -27,17 +27,17 @@ class VmdWriter():
                 # モデル名を20byteで切る
                 model_bname = self.data_set.rep_model.name.encode('cp932').decode('shift_jis').encode('shift_jis')[:20]
             except Exception:
-                logger.warning("モデル名に日本語・英語で判読できない文字が含まれているため、仮モデル名を設定します。 %s", self.data_set.rep_model.name, decoration=MLogger.DECORATION_BOX)
+                logger.warning("모델명에 일본어, 영어로 판독할 수 없는 문자가 포함되어 있으므로 임시 모델명을 설정합니다. %s", self.data_set.rep_model.name, decoration=MLogger.DECORATION_BOX)
                 model_bname = "Vmd Sized Model".encode('shift_jis')[:20]
 
             # 20文字に満たなかった場合、埋める
             model_bname = model_bname.ljust(20, b'\x00')
-                
+
             fout.write(model_bname)
         else:
             # カメラ・照明
             fout.write(b'\x83J\x83\x81\x83\x89\x81E\x8f\xc6\x96\xbe\x00on Data')
-        
+
         # bone frames
         fout.write(struct.pack('<L', len(bone_frames)))  # ボーンフレーム数
         for bf in bone_frames:
@@ -54,10 +54,10 @@ class VmdWriter():
         fout.write(struct.pack('<L', len(self.data_set.motion.shadows)))  # セルフ影キーフレーム数
         for cf in self.data_set.motion.shadows:
             cf.write(fout)
-            
+
         if len(camera_frames) == 0:
             fout.write(struct.pack('<L', len(self.data_set.motion.showiks)))  # モデル表示・IK on/offキーフレーム数
             for sf in self.data_set.motion.showiks:
                 sf.write(fout)
-        
+
         fout.close()

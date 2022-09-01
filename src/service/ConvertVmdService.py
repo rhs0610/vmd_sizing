@@ -26,13 +26,13 @@ class ConvertVmdService():
         logging.basicConfig(level=self.options.logging_level, format="%(message)s [%(module_name)s]")
 
         try:
-            service_data_txt = "VMD変換処理実行\n------------------------\nexeバージョン: {version_name}\n".format(version_name=self.options.version_name) \
+            service_data_txt = "VMD변환 처리 실행\n------------------------\nexe버전: {version_name}\n".format(version_name=self.options.version_name) \
 
-            service_data_txt = "{service_data_txt}　　ボーンCSV: {bone_csv}\n".format(service_data_txt=service_data_txt,
+            service_data_txt = "{service_data_txt}　　본CSV: {bone_csv}\n".format(service_data_txt=service_data_txt,
                                     bone_csv=os.path.basename(self.options.bone_csv_path)) # noqa
-            service_data_txt = "{service_data_txt}　　モーフCSV: {morph_csv}\n".format(service_data_txt=service_data_txt,
+            service_data_txt = "{service_data_txt}　　모프CSV: {morph_csv}\n".format(service_data_txt=service_data_txt,
                                     morph_csv=os.path.basename(self.options.morph_csv_path)) # noqa
-            service_data_txt = "{service_data_txt}　　カメラCSV: {camera_csv}\n".format(service_data_txt=service_data_txt,
+            service_data_txt = "{service_data_txt}　　카메라CSV: {camera_csv}\n".format(service_data_txt=service_data_txt,
                                     camera_csv=os.path.basename(self.options.camera_csv_path)) # noqa
 
             logger.info(service_data_txt, decoration=MLogger.DECORATION_BOX)
@@ -42,9 +42,9 @@ class ConvertVmdService():
 
             return result
         except SizingException as se:
-            logger.error("VMD変換処理が処理できないデータで終了しました。\n\n%s", se.message, decoration=MLogger.DECORATION_BOX)
+            logger.error("VMD 변환 처리기 처리할 수 없는 데이터로 종료되었습니다.\n\n%s", se.message, decoration=MLogger.DECORATION_BOX)
         except Exception:
-            logger.critical("VMD変換処理が意図せぬエラーで終了しました。\n\n%s", traceback.format_exc(), decoration=MLogger.DECORATION_BOX)
+            logger.critical("VMD 변환 처리가 의도치 않은 오류로 종료되었습니다.\n\n%s", traceback.format_exc(), decoration=MLogger.DECORATION_BOX)
         finally:
             logging.shutdown()
 
@@ -75,64 +75,64 @@ class ConvertVmdService():
 
                     try:
                         if len(row) < 0 or not row[0]:
-                            logger.error("[ボーン] %s行目のボーン名（1列目）が設定されていません", rno, decoration=MLogger.DECORATION_BOX)
+                            logger.error("[본]%s행 째 본 이름(1열째)이 설정되어 있지 않습니다", rno, decoration=MLogger.DECORATION_BOX)
                             return False
 
                         # ボーン名
                         bf.set_name(row[0])
                     except Exception as e:
-                        logger.error("[ボーン] %s行目のボーン名の読み取りに失敗しました\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
+                        logger.error("[본] %s행 본 이름 읽기에 실패했습니다\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
                         return False
 
                     try:
                         if len(row) < 1 or not row[1]:
-                            logger.error("[ボーン] %s行目のフレーム番号（2列目）が設定されていません", rno, decoration=MLogger.DECORATION_BOX)
+                            logger.error("[본] %s행째 프레임 번호(2열째)가 설정되어 있지 않습니다.", rno, decoration=MLogger.DECORATION_BOX)
                             return False
 
-                        # フレーム
+                        # 프레임
                         bf.fno = int(float(row[1]))
 
                         if bf.fno < 0:
-                            logger.error("[ボーン] %s行目のフレーム番号（2列目）に負数が設定されています", rno, decoration=MLogger.DECORATION_BOX)
+                            logger.error("[본] %s행째 프레임 번호(2열째)에 음수로 설정되어 있습니다.", rno, decoration=MLogger.DECORATION_BOX)
                             return False
 
                     except Exception as e:
-                        logger.error("[ボーン] %s行目のフレーム番号の読み取りに失敗しました\nフレーム番号は半角数字のみ入力可能です。\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
+                        logger.error("[본] %s행째 프레임 번호 판독에 실패했습니다\n프레임 번호는 반각 숫자만 입력 가능합니다.\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
                         return False
 
                     try:
                         if len(row) < 4 or not row[2] or not row[3] or not row[4]:
-                            logger.error("[ボーン] %s行目の位置（3-5列目）のいずれかが設定されていません", rno, decoration=MLogger.DECORATION_BOX)
+                            logger.error("[본] %s행째 위치(3-5번째 열) 중 하나가 설정되어 있지 않습니다.", rno, decoration=MLogger.DECORATION_BOX)
                             return False
 
-                        # 位置
+                        # 위치
                         bf.position = MVector3D(float(row[2]), float(row[3]), float(row[4]))
                     except Exception as e:
-                        logger.error("[ボーン] %s行目の位置の読み取りに失敗しました\n位置は半角数字・符号・小数点のみ入力可能です。\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
+                        logger.error("[본] %s행째 위치 판독에 실패했습니다\n위치는 반각숫자, 부호, 소수점만 입력 가능합니다.\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
                         return False
 
                     try:
                         if len(row) < 7 or not row[5] or not row[6] or not row[7]:
-                            logger.error("[ボーン] %s行目の回転（6-8列目）のいずれかが設定されていません", rno, decoration=MLogger.DECORATION_BOX)
+                            logger.error("[본] %s행째 회전(6-8번째 열)중 하나가 설정되어 있지 않습니다", rno, decoration=MLogger.DECORATION_BOX)
                             return False
 
-                        # 回転
+                        # 회전
                         bf.rotation = MQuaternion.fromEulerAngles(float(row[5]), float(row[6]) * -1, float(row[7]) * -1)
                     except Exception as e:
-                        logger.error("[ボーン] %s行目の回転の読み取りに失敗しました\n位置は半角数字・符号・小数点のみ入力可能です。\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
+                        logger.error("[본] %s행 회전의 판독에 실패했습니다\n위치는 반각숫자, 부호, 소수점만 입력 가능합니다.\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
                         return False
 
                     try:
                         if len(row) < 71:
-                            logger.error("[ボーン] %s行目の補間曲線（9-72列目）のいずれかが設定されていません", rno, decoration=MLogger.DECORATION_BOX)
+                            logger.error("[본] %s행째의 보간 곡선(9-72열째) 중 하나가 설정되어 있지 않습니다.", rno, decoration=MLogger.DECORATION_BOX)
                             return False
-                        
+
                         for cidx in range(8, 72):
                             if not row[cidx]:
-                                logger.error("[ボーン] %s行目の補間曲線の%s番目が設定されていません", rno, cidx - 7, decoration=MLogger.DECORATION_BOX)
+                                logger.error("[본] %s행 보간곡선의 %s번째가 설정되어 있지 않습니다.", rno, cidx - 7, decoration=MLogger.DECORATION_BOX)
                                 return False
 
-                        # 補間曲線(一旦floatで読み込んで指数等も読み込んだ後、intに変換)
+                        # 보간곡선(一旦floatで読み込んで指数等も読み込んだ後、intに変換)
                         bf.interpolation = [int(float(row[8])), int(float(row[9])), int(float(row[10])), int(float(row[11])), int(float(row[12])), int(float(row[13])), \
                                             int(float(row[14])), int(float(row[15])), int(float(row[16])), int(float(row[17])), int(float(row[18])), int(float(row[19])), \
                                             int(float(row[20])), int(float(row[21])), int(float(row[22])), int(float(row[23])), int(float(row[24])), int(float(row[25])), \
@@ -144,16 +144,16 @@ class ConvertVmdService():
                                             int(float(row[56])), int(float(row[57])), int(float(row[58])), int(float(row[59])), int(float(row[60])), int(float(row[61])), \
                                             int(float(row[62])), int(float(row[63])), int(float(row[64])), int(float(row[65])), int(float(row[66])), int(float(row[67])), \
                                             int(float(row[68])), int(float(row[69])), int(float(row[70])), int(float(row[71]))]
-                        
+
                         for bidx, bi in enumerate(bf.interpolation):
                             if 0 > bi:
-                                logger.error("[ボーン] %s行目の補間曲線（%s列目）に負数が設定されています", rno, bidx + 9, decoration=MLogger.DECORATION_BOX)
+                                logger.error("[본] %s행째의 보간곡선(%s열째)에 음수로 설정되어 있습니다.", rno, bidx + 9, decoration=MLogger.DECORATION_BOX)
                                 return False
 
                     except Exception as e:
-                        logger.error("[ボーン] %s行目の補間曲線の読み取りに失敗しました\n位置は半角数字のみ入力可能です。\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
+                        logger.error("[본] %s행 보간곡선 읽기가 실패했습니다\n위치는 반각숫자만 입력 가능합니다.\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
                         return False
-                    
+
                     bf.read = True
                     bf.key = True
 
@@ -165,7 +165,7 @@ class ConvertVmdService():
                     cnt += 1
 
                     if cnt % 10000 == 0:
-                        logger.info("[ボーン] %sキー目:終了", cnt)
+                        logger.info("[본] %s키째 : 종료", cnt)
 
         if self.options.morph_csv_path and os.path.exists(self.options.morph_csv_path):
             # モーフモーションCSVディレクトリパス
@@ -177,7 +177,7 @@ class ConvertVmdService():
                 bone_fpath = "{0}\\{1}_morph_{2:%Y%m%d_%H%M%S}.vmd".format(motion_csv_dir_path, motion_csv_file_name, dt_now)
 
             # モーフCSV読み込み
-            with open(self.options.morph_csv_path, encoding='cp932', mode='r') as f:
+            with open(self.options.morph_csv_path, encoding='utf-8', mode='r') as f:
                 reader = csv.reader(f)
                 next(reader)  # ヘッダーを読み飛ばす
 
@@ -188,39 +188,39 @@ class ConvertVmdService():
 
                     try:
                         if len(row) < 0 or not row[0]:
-                            logger.error("[モーフ] %s行目のモーフ名（1列目）が設定されていません", rno, decoration=MLogger.DECORATION_BOX)
+                            logger.error("[모프] %s행째의 모프명(1열째)이 설정되어 있지 않습니다.", rno, decoration=MLogger.DECORATION_BOX)
                             return False
 
                         # ボーン名
                         mf.set_name(row[0])
                     except Exception as e:
-                        logger.error("[モーフ] %s行目のモーフ名の読み取りに失敗しました\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
+                        logger.error("[모프] %s행 모프 이름 판독에 실패했습니다\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
                         return False
 
                     try:
                         if len(row) < 1 or not row[1]:
-                            logger.error("[モーフ] %s行目のフレーム番号（2列目）が設定されていません", rno, decoration=MLogger.DECORATION_BOX)
+                            logger.error("[모프] %s행째 프레임 번호(2열째)가 설정되어 있지 않습니다.", rno, decoration=MLogger.DECORATION_BOX)
                             return False
 
-                        # フレーム
+                        # 프레임
                         mf.fno = int(float(row[1]))
 
                         if mf.fno < 0:
-                            logger.error("[モーフ] %s行目のフレーム番号（2列目）に負数が設定されています", rno, decoration=MLogger.DECORATION_BOX)
+                            logger.error("[모프] %s행째 프레임 번호(2열째)에 음수로 설정되어 있습니다.", rno, decoration=MLogger.DECORATION_BOX)
                             return False
                     except Exception as e:
-                        logger.error("[モーフ] %s行目のフレーム番号の読み取りに失敗しました\nフレーム番号は半角数字のみ入力可能です。\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
+                        logger.error("[모프] %s행째 프레임 번호 판독에 실패했습니다\n프레임 번호는 반각 숫자만 입력 가능합니다.\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
                         return False
 
                     try:
                         if len(row) < 2 or not row[2]:
-                            logger.error("[モーフ] %s行目の大きさ（3列目）が設定されていません", rno, decoration=MLogger.DECORATION_BOX)
+                            logger.error("[모프] %s행째의 크기(3열째)가 설정되어 있지 않습니다.", rno, decoration=MLogger.DECORATION_BOX)
                             return False
 
                         # 値
                         mf.ratio = float(row[2])
                     except Exception as e:
-                        logger.error("[モーフ] %s行目の大きさの読み取りに失敗しました\n大きさは半角数字・符号・小数点のみ入力可能です。\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
+                        logger.error("[모프] %s줄 크기 판독에 실패했습니다\n 크기는 반각 숫자, 부호, 소수점만 입력 가능합니다.\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
                         return False
 
                     if mf.name not in bone_motion.morphs:
@@ -231,7 +231,7 @@ class ConvertVmdService():
                     cnt += 1
 
                     if cnt % 1000 == 0:
-                        logger.info("[モーフ] %sキー目:終了", cnt)
+                        logger.info("[모프] %s키째 : 종료", cnt)
 
         if len(bone_motion.bones.keys()) > 0 or len(bone_motion.morphs.keys()) > 0:
             # ボーンかモーフのキーがある場合、まとめて出力
@@ -242,18 +242,18 @@ class ConvertVmdService():
 
             VmdWriter(data_set).write()
 
-            logger.info("ボーン・モーフモーションVMD: %s", bone_fpath, decoration=MLogger.DECORATION_BOX)
+            logger.info("본 모프 모션VMD: %s", bone_fpath, decoration=MLogger.DECORATION_BOX)
 
         if self.options.camera_csv_path and os.path.exists(self.options.camera_csv_path):
-            # カメラモーションCSVディレクトリパス
+            # 카메라モーションCSVディレクトリパス
             motion_csv_dir_path = MFileUtils.get_dir_path(self.options.camera_csv_path)
-            # カメラモーションCSVファイル名・拡張子
+            # 카메라モーションCSVファイル名・拡張子
             motion_csv_file_name, _ = os.path.splitext(os.path.basename(self.options.camera_csv_path))
 
             camera_fpath = "{0}\\{1}_camera_{2:%Y%m%d_%H%M%S}.vmd".format(motion_csv_dir_path, motion_csv_file_name, dt_now)
             camera_motion = VmdMotion()
 
-            # カメラCSV読み込み
+            # 카메라CSV読み込み
             with open(self.options.camera_csv_path, encoding='cp932', mode='r') as f:
                 reader = csv.reader(f)
                 next(reader)  # ヘッダーを読み飛ばす
@@ -265,94 +265,94 @@ class ConvertVmdService():
 
                     try:
                         if len(row) < 1 or not row[0]:
-                            logger.error("[カメラ] %s行目のフレーム番号（1列目）が設定されていません", rno, decoration=MLogger.DECORATION_BOX)
+                            logger.error("[카메라] %s행의 프레임 번호(1번째 열)가설정되어 있지 않습니다", rno, decoration=MLogger.DECORATION_BOX)
                             return False
 
-                        # フレーム
+                        # 프레임
                         cf.fno = int(row[0])
 
                         if cf.fno < 0:
-                            logger.error("[カメラ] %s行目のフレーム番号（1列目）に負数が設定されています", rno, decoration=MLogger.DECORATION_BOX)
+                            logger.error("[카메라] %s행의 프레임 번호(1번째 열)に음수로 설정되어 있습니다.", rno, decoration=MLogger.DECORATION_BOX)
                             return False
                     except Exception as e:
-                        logger.error("[カメラ] %s行目のフレーム番号の読み取りに失敗しました\nフレーム番号は半角数字のみ入力可能です。\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
+                        logger.error("[카메라] %s행의 프레임 번호를 읽는데 실패했습니다\n프레임번호는  반각숫자만 입력 가능합니다.\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
                         return False
 
                     try:
                         if len(row) < 3 or not row[1] or not row[2] or not row[3]:
-                            logger.error("[カメラ] %s行目の位置（2-4列目）のいずれかが設定されていません", rno, decoration=MLogger.DECORATION_BOX)
+                            logger.error("[카메라] %s행의위치(2-4번째 열)중 하나 가설정되어 있지 않습니다", rno, decoration=MLogger.DECORATION_BOX)
                             return False
 
-                        # 位置
+                        # 위치
                         cf.position = MVector3D(float(row[1]), float(row[2]), float(row[3]))
                     except Exception as e:
-                        logger.error("[カメラ] %s行目の位置の読み取りに失敗しました\n位置は半角数字・符号・小数点のみ入力可能です。\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
+                        logger.error("[카메라] %s행의 위치를 읽는데 실패했습니다\n위치는 반각숫자,부호,소수점만 입력 가능합니다.\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
                         return False
 
                     try:
                         if len(row) < 6 or not row[4] or not row[5] or not row[6]:
-                            logger.error("[カメラ] %s行目の回転（5-7列目）のいずれかが設定されていません", rno, decoration=MLogger.DECORATION_BOX)
+                            logger.error("[카메라] %s행의 회전(5-7번째 열)중 하나가 설정되어 있지 않습니다", rno, decoration=MLogger.DECORATION_BOX)
                             return False
 
-                        # 回転（オイラー角）
+                        # 회전(オイラー角)
                         cf.euler = MVector3D(float(row[4]), float(row[5]), float(row[6]))
                     except Exception as e:
-                        logger.error("[カメラ] %s行目の回転の読み取りに失敗しました\n回転は半角数字・符号・小数点のみ入力可能です。\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
+                        logger.error("[카메라] %s행의 회전을 읽는데 실패했습니다\n회전은 반각숫자,부호,소수점만입력가능합니다.\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
                         return False
 
                     try:
                         if len(row) < 7 or not row[7]:
-                            logger.error("[カメラ] %s行目の距離（8列目）が設定されていません", rno, decoration=MLogger.DECORATION_BOX)
+                            logger.error("[카메라] %s행의 거리(8번째 열)가 설정되어 있지 않습니다", rno, decoration=MLogger.DECORATION_BOX)
                             return False
 
-                        # 距離
+                        # 거리
                         cf.length = -(float(row[7]))
                     except Exception as e:
-                        logger.error("[カメラ] %s行目の距離の読み取りに失敗しました\n距離は半角数字・符号・小数点のみ入力可能です。\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
+                        logger.error("[카메라] %s행의거리를 읽는데 실패했습니다\n거리는 반각숫자,부호,소수점만입력가능합니다.\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
                         return False
 
                     try:
                         if len(row) < 8 or not row[8]:
-                            logger.error("[カメラ] %s行目の視野角（9列目）が設定されていません", rno, decoration=MLogger.DECORATION_BOX)
+                            logger.error("[카메라] %s행의 시야각(9번째 열)이설정되어 있지 않습니다", rno, decoration=MLogger.DECORATION_BOX)
                             return False
 
-                        # 視野角
+                        # 시야각
                         cf.angle = int(row[8])
 
                         if cf.angle < 0:
-                            logger.error("[カメラ] %s行目の視野角（9列目）に負数が設定されています", rno, decoration=MLogger.DECORATION_BOX)
+                            logger.error("[카메라] %s행의 시야각(9번째 열)이 음수로 설정되어 있습니다.", rno, decoration=MLogger.DECORATION_BOX)
                             return False
 
                     except Exception as e:
-                        logger.error("[カメラ] %s行目の視野角の読み取りに失敗しました\n視野角は半角数字のみ入力可能です。\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
+                        logger.error("[카메라] %s행의시야각을 읽는데 실패했습니다\n시야각은 반각숫자만 입력 가능합니다.\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
                         return False
 
                     try:
                         if len(row) < 8 or not row[9]:
-                            logger.error("[カメラ] %s行目のパース（10列目）が設定されていません", rno, decoration=MLogger.DECORATION_BOX)
+                            logger.error("[카메라] %s행의Perspective(10번째 열)가 설정되어 있지 않습니다", rno, decoration=MLogger.DECORATION_BOX)
                             return False
 
-                        # パース
+                        # Perspective
                         cf.perspective = int(row[9])
 
                         if cf.perspective not in [0, 1]:
-                            logger.error("[カメラ] %s行目のパース（10列目）に0, 1以外の値が設定されています", rno, decoration=MLogger.DECORATION_BOX)
+                            logger.error("[카메라] %s행의Perspective(10번째 열)에 0, 1 이외의 값이 설정되어 있습니다", rno, decoration=MLogger.DECORATION_BOX)
                             return False
                     except Exception as e:
-                        logger.error("[カメラ] %s行目のパースの読み取りに失敗しました\nパースは0, 1のみ入力可能です。\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
+                        logger.error("[카메라] %s행의Perspective를 읽는데 실패했습니다\nPerspective에는 0, 1만 입력 가능합니다.\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
                         return False
 
                     try:
                         if len(row) < 33:
-                            logger.error("[カメラ] %s行目の補間曲線（11-34列目）のいずれかが設定されていません", rno, decoration=MLogger.DECORATION_BOX)
+                            logger.error("[카메라] %s행의 보간곡선(11-34번째 열)중 하나가 설정되어 있지 않습니다", rno, decoration=MLogger.DECORATION_BOX)
                             return False
-                        
+
                         for cidx in range(10, 34):
                             if not row[cidx]:
-                                logger.error("[カメラ] %s行目の補間曲線の%s番目が設定されていません", rno, cidx - 9, decoration=MLogger.DECORATION_BOX)
+                                logger.error("[카메라] %s행의 보간곡선의 %s번째가설정되어 있지 않습니다", rno, cidx - 9, decoration=MLogger.DECORATION_BOX)
                                 return False
 
-                        # 補間曲線(一旦floatで読み込んで指数等も読み込んだ後、intに変換)
+                        # 보간곡선(一旦floatで読み込んで指数等も読み込んだ後、intに変換)
                         cf.interpolation = [int(float(row[10])), int(float(row[11])), int(float(row[12])), int(float(row[13])), int(float(row[14])), int(float(row[15])), \
                                             int(float(row[16])), int(float(row[17])), int(float(row[18])), int(float(row[19])), int(float(row[20])), int(float(row[21])), \
                                             int(float(row[22])), int(float(row[23])), int(float(row[24])), int(float(row[25])), int(float(row[26])), int(float(row[27])), \
@@ -360,30 +360,30 @@ class ConvertVmdService():
 
                         for cidx, ci in enumerate(cf.interpolation):
                             if 0 > ci:
-                                logger.error("[カメラ] %s行目の補間曲線（%s列目）に負数が設定されています", rno, cidx + 11, decoration=MLogger.DECORATION_BOX)
+                                logger.error("[카메라] %s행의 보간곡선(%s번째 열)이 음수로 설정되어 있습니다.", rno, cidx + 11, decoration=MLogger.DECORATION_BOX)
                                 return False
 
                     except Exception as e:
-                        logger.error("[カメラ] %s行目の補間曲線の読み取りに失敗しました\n位置は半角数字のみ入力可能です。\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
+                        logger.error("[카메라] %s행의 보간곡선을 읽는데 실패했습니다\n위치는 반각숫자만 입력 가능합니다.\n%s", rno, e, decoration=MLogger.DECORATION_BOX)
                         return False
-                   
+
                     camera_motion.cameras[cf.fno] = cf
 
                     cnt += 1
 
                     if cnt % 500 == 0:
-                        logger.info("[カメラ] %sキー目:終了", cnt)
+                        logger.info("[카메라] %s키째:완료", cnt)
 
             if len(camera_motion.cameras) > 0:
                 # ボーンかモーフのキーがある場合、まとめて出力
 
                 model = PmxModel()
-                model.name = "カメラ・照明"
+                model.name = "카메라, 조명"
                 data_set = MOptionsDataSet(camera_motion, model, model, camera_fpath, False, False, [], None, 0, [])
 
                 VmdWriter(data_set).write()
 
-                logger.info("カメラモーションVMD: %s", camera_fpath, decoration=MLogger.DECORATION_BOX)
+                logger.info("카메라 모션 VMD: %s", camera_fpath, decoration=MLogger.DECORATION_BOX)
 
         return True
 

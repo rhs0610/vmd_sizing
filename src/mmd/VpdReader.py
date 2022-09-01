@@ -34,12 +34,12 @@ class VpdReader():
 
         for n in range(len(lines)):
             # モデル名
-            if "// 親ファイル名" in lines[n]:
+            if "// 부모 파일 명" in lines[n]:
                 m = re.search(model_name_pattern, lines[n])
                 if len(m.groups()) > 0:
                     return m.groups()[0]
 
-        return "VPDデータ解析失敗"
+        return "VPD데이터 해석 실패"
 
     def read_data(self):
         # VPDファイルを通常読み込み
@@ -75,12 +75,12 @@ class VpdReader():
                     motion.model_name = result_values[0]
 
                     continue
-                
+
                 # 括弧開始
                 result_values = self.read_line(lines[n], bone_start_pattern, n)
                 if result_values:
                     bone_name = result_values[0]
-                    
+
                     # キーフレ生成
                     frame = VmdBoneFrame(0)
                     frame.set_name(bone_name)
@@ -88,17 +88,17 @@ class VpdReader():
                     frame.read = True
 
                     continue
-                
+
                 if frame:
                     # 括弧内のチェック
-                    
+
                     # 位置
                     result_values = self.read_line(lines[n], bone_pos_pattern, n)
                     if result_values:
                         # 位置X,Y,Z
                         frame.position = MVector3D(float(result_values[0]), float(result_values[1]), float(result_values[2]))
                         continue
-                    
+
                     # 角度
                     result_values = self.read_line(lines[n], bone_rot_pattern, n)
                     if result_values:
@@ -122,11 +122,11 @@ class VpdReader():
             # 終了命令
             raise ke
         except SizingException as se:
-            logger.error("VPD読み込み処理が処理できないデータで終了しました。\n\n%s", se.message, decoration=MLogger.DECORATION_BOX)
+            logger.error("VPD읽기 처리가 처리할 수 없는 데이터로 종료했습니다.\n\n%s", se.message, decoration=MLogger.DECORATION_BOX)
             return se
         except Exception as e:
             import traceback
-            logger.critical("VPD読み込み処理が意図せぬエラーで終了しました。\n\n%s", traceback.format_exc(), decoration=MLogger.DECORATION_BOX)
+            logger.critical("VPD읽기 처리가 의도치 않은 오류로 종료했습니다.\n\n%s", traceback.format_exc(), decoration=MLogger.DECORATION_BOX)
             raise e
 
     # 一行を読み込む
@@ -138,7 +138,7 @@ class VpdReader():
 
         # 正規表現に合致するのが取れなかった場合、None
         return None
- 
+
     def hexdigest(self):
         sha1 = hashlib.sha1()
 
@@ -152,7 +152,7 @@ class VpdReader():
         sha1.update(self.file_path.encode('utf-8'))
 
         return sha1.hexdigest()
-        
+
     # ファイルのエンコードを取得する
     def get_file_encoding(self, file_path):
         try:
@@ -161,9 +161,9 @@ class VpdReader():
             f.close()
         except Exception:
             raise MParseException("unknown encoding!")
-            
+
         codelst = ('shift-jis', 'utf_8')
-        
+
         for encoding in codelst:
             try:
                 fstr = fbytes.decode(encoding)  # bytes文字列から指定文字コードの文字列に変換
@@ -173,6 +173,6 @@ class VpdReader():
                 return encoding
             except Exception:
                 pass
-                
+
         raise MParseException("unknown encoding!")
-        
+

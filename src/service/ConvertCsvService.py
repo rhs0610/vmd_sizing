@@ -23,7 +23,7 @@ class ConvertCsvService:
         logging.basicConfig(level=self.options.logging_level, format="%(message)s [%(module_name)s]")
 
         try:
-            service_data_txt = "CSV変換処理実行\n------------------------\nexeバージョン: {version_name}\n".format(
+            service_data_txt = "CSV 변환 처리 실행\n------------------------\nexe버전: {version_name}\n".format(
                 version_name=self.options.version_name
             )
             service_data_txt = "{service_data_txt}　　VMD: {vmd}\n".format(
@@ -37,9 +37,9 @@ class ConvertCsvService:
 
             return result
         except SizingException as se:
-            logger.error("CSV変換処理が処理できないデータで終了しました。\n\n%s", se.message, decoration=MLogger.DECORATION_BOX)
+            logger.error("CSV 변환 처리가 처리할 수 없는 데이터로 종료되었습니다.\n\n%s", se.message, decoration=MLogger.DECORATION_BOX)
         except Exception:
-            logger.critical("CSV変換処理が意図せぬエラーで終了しました。\n\n%s", traceback.format_exc(), decoration=MLogger.DECORATION_BOX)
+            logger.critical("CSV 변환처리가 의도치 않은 오류로 종료되었습니다.\n\n%s", traceback.format_exc(), decoration=MLogger.DECORATION_BOX)
         finally:
             logging.shutdown()
 
@@ -53,7 +53,7 @@ class ConvertCsvService:
         dt_now = datetime.now()
 
         if self.options.motion.motion_cnt == self.options.motion.morph_cnt == self.options.motion.camera_cnt == 0:
-            logger.warning("出力可能なモーションデータ（ボーン・モーフ・カメラ）がありません", decoration=MLogger.DECORATION_BOX)
+            logger.warning("출력 가능한 모션 데이터(본, 모프, 카메라)가 없습니다.", decoration=MLogger.DECORATION_BOX)
 
         if self.options.motion.motion_cnt > 0:
             # ボーンモーションがある場合、ボーンモーション出力
@@ -90,7 +90,7 @@ class ConvertCsvService:
                         f.write(s)
                         f.write("\n")
 
-            logger.info("ボーンモーションCSV: %s", bone_fpath, decoration=MLogger.DECORATION_BOX)
+            logger.info("본 모션CSV: %s", bone_fpath, decoration=MLogger.DECORATION_BOX)
 
         if self.options.motion.morph_cnt > 0:
             # モーフ出力
@@ -99,9 +99,9 @@ class ConvertCsvService:
             )
 
             # Excel等で読めるよう、cp932限定
-            with open(morph_fpath, encoding="cp932", mode="w") as f:
+            with open(morph_fpath, encoding="utf-8", mode="w") as f:
 
-                s = "モーフ名,フレーム,大きさ"
+                s = "모프명, 프레임, 크기"
                 f.write(s)
                 f.write("\n")
 
@@ -112,7 +112,7 @@ class ConvertCsvService:
                         f.write(s)
                         f.write("\n")
 
-            logger.info("モーフモーションCSV: %s", morph_fpath, decoration=MLogger.DECORATION_BOX)
+            logger.info("모프 모션CSV: %s", morph_fpath, decoration=MLogger.DECORATION_BOX)
 
         if self.options.motion.camera_cnt > 0:
             # カメラ出力
@@ -148,6 +148,6 @@ class ConvertCsvService:
                     f.write(s)
                     f.write("\n")
 
-            logger.info("カメラモーションCSV: %s", camera_fpath, decoration=MLogger.DECORATION_BOX)
+            logger.info("카메라 모션CSV: %s", camera_fpath, decoration=MLogger.DECORATION_BOX)
 
         return True

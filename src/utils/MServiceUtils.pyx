@@ -38,7 +38,7 @@ cdef c_calc_IK(PmxModel model, BoneLinks links, VmdMotion motion, int fno, MVect
         local_z_axis = MVector3D(0, 0, -1)
         local_y_axis = MVector3D.crossProduct(local_x_axis, local_z_axis).normalized()
         bone_axis_dict[bone_name] = {"x": local_x_axis, "y": local_y_axis, "z": local_z_axis}
-    
+
     cdef MVector3D local_effector_pos
     cdef MVector3D local_target_pos
 
@@ -148,13 +148,13 @@ cdef c_calc_IK(PmxModel model, BoneLinks links, VmdMotion motion, int fno, MVect
                     diff = "○" if (x_degree != new_x_degree or y_degree != new_y_degree or z_degree != new_z_degree) else "－"
                     logger.debug(f"limit_degree: {diff}: {x_degree}, {y_degree}, {z_degree} -> {new_x_degree}, {new_y_degree}, {new_z_degree}")
                     logger.debug(f"limit_qq: {new_ik_qq.toEulerAngles4MMD()}")
-                
+
                 bf.rotation = new_ik_qq
 
         # 位置の差がほとんどない場合、終了
         if (local_effector_pos - local_target_pos).lengthSquared() < 0.0001:
             return
-        
+
     return
 
 
@@ -166,7 +166,7 @@ def separate_local_qq(fno: int, bone_name: str, qq: MQuaternion, global_x_axis: 
 cdef tuple c_separate_local_qq(int fno, str bone_name, MQuaternion qq, MVector3D global_x_axis):
     # ローカル座標系（ボーンベクトルが（1，0，0）になる空間）の向き
     cdef MVector3D local_axis = MVector3D(1, 0, 0)
-    
+
     # グローバル座標系（Ａスタンス）からローカル座標系（ボーンベクトルが（1，0，0）になる空間）への変換
     cdef MQuaternion global2local_qq = MQuaternion.rotationTo(global_x_axis, local_axis)
     cdef MQuaternion local2global_qq = MQuaternion.rotationTo(local_axis, global_x_axis)
@@ -200,7 +200,7 @@ cdef tuple c_separate_local_qq(int fno, str bone_name, MQuaternion qq, MVector3D
     mat_z1.rotate(yz_qq)                # YZの回転量
     mat_z1.rotate(global2local_qq)      # グローバル軸の回転量からローカルの回転量に変換
     mat_z1.translate(local_axis)        # ローカル軸方向に伸ばす
-    
+
     cdef MVector3D mat_z1_vec = mat_z1 * MVector3D()
     mat_z1_vec.setZ(0)                  # Z方向の移動量を潰す
 
@@ -216,7 +216,7 @@ cdef tuple c_separate_local_qq(int fno, str bone_name, MQuaternion qq, MVector3D
     cdef MQuaternion z_qq = mat_z2.toQuaternion()
 
     # YZ回転からY成分だけ取り出す -----------
-    
+
     cdef MMatrix4x4 mat_y1 = MMatrix4x4()
     mat_y1.setToIdentity()              # 初期化
     mat_y1.rotate(yz_qq)                # グローバルYZの回転量
@@ -261,7 +261,7 @@ def calc_front_global_pos(model: PmxModel, links: BoneLinks, motion: VmdMotion, 
 cdef tuple c_calc_front_global_pos(PmxModel model, BoneLinks links, VmdMotion motion, int fno, BoneLinks limit_links, BoneLinks direction_limit_links):
     # グローバル位置
     cdef dict global_3ds, org_center_global_3ds, total_mats
-    
+
     (global_3ds, total_mats) = c_calc_global_pos(model, links, motion, fno, limit_links, False, False)
     org_center_global_3ds = global_3ds
 
@@ -331,7 +331,7 @@ cdef tuple c_calc_global_pos(PmxModel model, BoneLinks links, VmdMotion motion, 
             else:
                 # 自分より前の行列結果を掛け算する
                 mm *= matrixs[m]
-        
+
         # 自分は、位置だけ掛ける
         global_3ds_dic[lname] = mm * v
 
@@ -355,7 +355,7 @@ cdef tuple c_calc_global_pos(PmxModel model, BoneLinks links, VmdMotion motion, 
             else:
                 # ローカル軸が設定されている場合、その値を採用
                 local_axis_qq = MQuaternion.fromDirection(model.bones[lname].local_x_vector.normalized(), MVector3D(0, 0, 1))
-            
+
             local_x_matrix.rotate(local_axis_qq)
 
             total_mats[lname] *= local_x_matrix
@@ -385,7 +385,7 @@ cpdef dict calc_global_pos_by_direction(MQuaternion direction_qq, dict target_po
         # logger.test("f: %s, direction_qq: %s", bone_name, direction_qq.toEulerAngles4MMD())
         # logger.test("f: %s, target_pos: %s", bone_name, target_pos)
         # logger.test("f: %s, direction_pos_dic: %s", bone_name, direction_pos_dic[bone_name])
-    
+
     return direction_pos_dic
 
 
@@ -479,7 +479,7 @@ cpdef MQuaternion deform_rotation(PmxModel model, VmdMotion motion, VmdBoneFrame
     cdef VmdBoneFrame effect_bf
 
     if bone.getExternalRotationFlag() and bone.effect_index in model.bone_indexes:
-        
+
         effect_parent_bone = bone
         effect_bone = model.bones[model.bone_indexes[bone.effect_index]]
         cnt = 0
@@ -533,9 +533,9 @@ cpdef MQuaternion deform_fix_rotation(str bone_name, MVector3D fixed_axis, MQuat
             elif "左" in bone_name and rot.x() > 0 and fixed_axis.x() < 0:
                 rot.setX(rot.x() * -1)
                 rot.setScalar(rot.scalar() * -1)
-            
+
             rot.normalize()
-        
+
         # 軸固定の場合、回転を制限する
         rot = MQuaternion.fromAxisAndAngle(fixed_axis, rot.toDegree())
 
@@ -583,8 +583,8 @@ def calc_leg_ik_ratio(data_set: MOptionsDataSet):
         y_ratio = 1 if org_leg_length == 0 else (rep_leg_length / org_leg_length)
 
         return xz_ratio, y_ratio, heads_tall_ratio
-    
-    logger.warning("「左足」「左ひざ」「左足首」「センター」のいずれかのボーンが不足しているため、足の長さの比率が測れませんでした。", decoration=MLogger.DECORATION_IN_BOX)
+
+    logger.warning("왼발, 왼무릎, 왼발목, 센터 중 한 개의 본이 부족해 다리 길이의 비율을 측정할 수 없었습니다.", decoration=MLogger.DECORATION_IN_BOX)
 
     return 1, 1, 1
 

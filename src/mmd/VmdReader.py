@@ -23,7 +23,7 @@ class VmdReader:
     def read_model_name(self):
         model_name = ""
         with open(self.file_path, "rb") as f:
-            # VMDファイルをバイナリ読み込み
+            # VMDファイルをバイナリ읽기
             self.buffer = f.read()
 
             # vmdバージョン
@@ -37,13 +37,13 @@ class VmdReader:
         return model_name
 
     def read_data(self):
-        # モーションパス
+        # 모션パス
         motion = VmdMotion()
         motion.path = self.file_path
 
         try:
             with open(self.file_path, "rb") as f:
-                # VMDファイルをバイナリ読み込み
+                # VMDファイルをバイナリ읽기
                 self.buffer = f.read()
 
                 # vmdバージョン
@@ -55,11 +55,11 @@ class VmdReader:
                 logger.test("model_bname %s, model_name: %s", model_bname, model_name)
                 motion.model_name = model_name
 
-                # モーション数
+                # 모션数
                 motion.motion_cnt = self.read_uint(4)
                 logger.test("motion.motion_cnt %s", motion.motion_cnt)
 
-                # 1F分のモーション情報
+                # 1F分の모션情報
 
                 prev_n = 0
                 for n in range(motion.motion_cnt):
@@ -108,21 +108,21 @@ class VmdReader:
 
                     if n // 10000 > prev_n:
                         prev_n = n // 10000
-                        logger.info("-- VMDモーション読み込み キー: %s" % n)
+                        logger.info("-- VMD 모션 읽기 키: %s" % n)
 
-                # モーフ数
+                # 모프数
                 motion.morph_cnt = self.read_uint(4)
                 logger.test("motion.morph_cnt %s", motion.morph_cnt)
 
-                # 1F分のモーフ情報
+                # 1F分の모프情報
                 prev_n = 0
                 for n in range(motion.morph_cnt):
                     morph = VmdMorphFrame()
                     morph.key = True
                     morph.read = True
 
-                    # モーフ ----------------------
-                    # モーフ名
+                    # 모프 ----------------------
+                    # 모프名
                     morph_bname, morph_name = self.read_text(15)
 
                     morph.name = morph_name
@@ -142,12 +142,12 @@ class VmdReader:
                         motion.morphs[morph_name] = {}
 
                     if morph.fno not in motion.morphs[morph_name]:
-                        # まだなければ辞書の該当部分にモーフフレームを追加
+                        # まだなければ辞書の該当部分に모프フレームを追加
                         motion.morphs[morph_name][morph.fno] = morph
 
                     if n // 1000 > prev_n:
                         prev_n = n // 1000
-                        logger.info("-- VMDモーション読み込み モーフ: %s" % n)
+                        logger.info("-- VMD 모션 읽기 모프: %s" % n)
 
                 try:
                     # カメラ数
@@ -200,7 +200,7 @@ class VmdReader:
 
                         if n // 10000 > prev_n:
                             prev_n = n // 10000
-                            logger.info("VMDカメラ読み込み キー: %s" % n)
+                            logger.info("VMD 카메라 읽기 키: %s" % n)
 
                 except Exception:
                     # 情報がない場合、catchして握りつぶす
@@ -314,11 +314,11 @@ class VmdReader:
             # 終了命令
             raise ke
         except SizingException as se:
-            logger.error("VMD読み込み処理が処理できないデータで終了しました。\n\n%s", se.message, decoration=MLogger.DECORATION_BOX)
+            logger.error("VMD읽기 처리가 처리할 수 없는 데이터로 종료했습니다.\n\n%s", se.message, decoration=MLogger.DECORATION_BOX)
             return se
         except Exception as e:
             import traceback
-            logger.critical("VMD読み込み処理が意図せぬエラーで終了しました。\n\n%s", traceback.format_exc(), decoration=MLogger.DECORATION_BOX)
+            logger.critical("VMD읽기 처리가 의도치 않은 오류로 종료했습니다.\n\n%s", traceback.format_exc(), decoration=MLogger.DECORATION_BOX)
             raise e
 
     def hexdigest(self):
@@ -416,7 +416,7 @@ class VmdReader:
         elif format_size == 4:
             format_type = "i"
         else:
-            raise MParseException("read_int format_sizeエラー {0}".format(format_size))
+            raise MParseException("read_int format_size 에러 {0}".format(format_size))
 
         return self.unpack(format_size, format_type)
 
@@ -429,7 +429,7 @@ class VmdReader:
         elif format_size == 4:
             format_type = "I"
         else:
-            raise MParseException("read_uint format_sizeエラー {0}".format(format_size))
+            raise MParseException("read_uint format_size 에러 {0}".format(format_size))
 
         return self.unpack(format_size, format_type)
 
@@ -440,7 +440,7 @@ class VmdReader:
         elif format_size == 8:
             format_type = "d"
         else:
-            raise MParseException("read_float format_sizeエラー {0}".format(format_size))
+            raise MParseException("read_float format_size 에러{0}".format(format_size))
 
         return self.unpack(format_size, format_type)
 

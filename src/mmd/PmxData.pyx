@@ -25,10 +25,10 @@ cdef class Deform:
 class Bdef1(Deform):
     def __init__(self, index0):
         self.index0 = index0
-    
+
     def get_idx_list(self, weight=0):
         return [self.index0]
-        
+
     def __str__(self):
         return "<Bdef1 {0}>".format(self.index0)
 
@@ -40,7 +40,7 @@ class Bdef2(Deform):
         self.index0 = index0
         self.index1 = index1
         self.weight0 = weight0
-        
+
     def get_idx_list(self, weight=0):
         idx_list = []
         if self.weight0 >= weight:
@@ -48,7 +48,7 @@ class Bdef2(Deform):
         if (1 - self.weight0) >= weight:
             idx_list.append(self.index1)
         return idx_list
-        
+
     def __str__(self):
         return "<Bdef2 {0}, {1}, {2}>".format(self.index0, self.index1, self.weight0)
 
@@ -65,7 +65,7 @@ class Bdef4(Deform):
         self.weight1 = weight1
         self.weight2 = weight2
         self.weight3 = weight3
-        
+
     def get_idx_list(self, weight=0):
         weight_idxs = np.where(np.array([self.weight0, self.weight1, self.weight2, self.weight3]) >= weight)
         return (np.array([self.index0, self.index1, self.index2, self.index3])[weight_idxs]).tolist()
@@ -75,7 +75,7 @@ class Bdef4(Deform):
 
     def copy(self):
         return Bdef4(self.index0, self.index1, self.index2, self.index3, self.weight0, self.weight1, self.weight2, self.weight3)
-            
+
 class Sdef(Deform):
     def __init__(self, index0, index1, weight0, sdef_c, sdef_r0, sdef_r1):
         self.index0 = index0
@@ -84,7 +84,7 @@ class Sdef(Deform):
         self.sdef_c = sdef_c
         self.sdef_r0 = sdef_r0
         self.sdef_r1 = sdef_r1
-        
+
     def get_idx_list(self):
         return [self.index0, self.index1]
 
@@ -93,7 +93,7 @@ class Sdef(Deform):
 
     def copy(self):
         return Sdef(self.index0, self.index1, self.weight0, self.sdef_c, self.sdef_r0, self.sdef_r1)
-    
+
 class Qdef(Deform):
     def __init__(self, index0, index1, weight0, sdef_c, sdef_r0, sdef_r1):
         self.index0 = index0
@@ -102,7 +102,7 @@ class Qdef(Deform):
         self.sdef_c = sdef_c
         self.sdef_r0 = sdef_r0
         self.sdef_r1 = sdef_r1
-        
+
     def get_idx_list(self):
         return [self.index0, self.index1]
 
@@ -124,7 +124,7 @@ cdef class Vertex:
         self.extended_uvs = extended_uvs or []
         self.deform = deform
         self.edge_factor = edge_factor
-        
+
     def __str__(self):
         return "<Vertex index:{0}, position:{1}, normal:{2}, uv:{3}, extended_uv: {4}, deform:{5}, edge:{6}".format(
                self.index, self.position, self.normal, self.uv, len(self.extended_uvs), self.deform, self.edge_factor)
@@ -146,7 +146,7 @@ cdef class Vertex:
             return self.deform.index0 == target_idx or self.deform.index1 == target_idx
 
         return False
-    
+
     # 最もウェイトが乗ってるボーンINDEXとそのウェイト（全ボーン対象）
     def get_max_deform_by_all(self):
         if type(self.deform) is Bdef2 or type(self.deform) is Sdef or type(self.deform) is Qdef:
@@ -174,7 +174,7 @@ cdef class Vertex:
                     return self.deform.index0
 
         elif type(self.deform) is Bdef4:
-            
+
             # 上半身系INDEXにウェイトが乗っているボーンのみ対象
             target_weights = []
             if self.deform.index0 in head_links_indexes.keys():
@@ -185,7 +185,7 @@ cdef class Vertex:
                 target_weights.append(self.deform.weight2)
             if self.deform.index3 in head_links_indexes.keys():
                 target_weights.append(self.deform.weight3)
-                    
+
             max_weight = max(target_weights)
 
             if max_weight == self.deform.weight1:
@@ -200,7 +200,7 @@ cdef class Vertex:
         return self.deform.index0
 
     def copy(self):
-        return Vertex(self.index, self.position.copy(), self.normal.copy(), self.uv.copy(), [euv.copy() for euv in self.extended_uvs], self.deform.copy(), self.edge_factor)   
+        return Vertex(self.index, self.position.copy(), self.normal.copy(), self.uv.copy(), [euv.copy() for euv in self.extended_uvs], self.deform.copy(), self.edge_factor)
 
 
 # 材質構造-----------------------
@@ -252,7 +252,7 @@ cdef class Ik:
 
     def copy(self):
         return Ik(self.target_index, self.loop, self.limit_radian, [l.copy for l in self.link])
-        
+
 cdef class IkLink:
 
     def __init__(self, bone_index, limit_angle, limit_min=None, limit_max=None):
@@ -266,7 +266,7 @@ cdef class IkLink:
 
     def copy(self):
         return Ik(self.bone_index, self.limit_angle, self.limit_min.copy(), self.limit_max.copy())
-                
+
 # ボーン構造-----------------------
 cdef class Bone:
     def __init__(self, name, english_name, position, parent_index, layer, flag, tail_position=None, tail_index=-1, effect_index=-1, effect_factor=0.0, fixed_axis=None,
@@ -298,7 +298,7 @@ cdef class Bone:
         self.local_offset = MVector3D()
         # IKオフセット(グローバル)
         self.global_ik_offset = MVector3D()
-        
+
         # IK制限角度
         self.ik_limit_min = MVector3D()
         self.ik_limit_max = MVector3D()
@@ -325,7 +325,7 @@ cdef class Bone:
         self.BONEFLAG_HAS_LOCAL_COORDINATE = 0x0800
         self.BONEFLAG_IS_AFTER_PHYSICS_DEFORM = 0x1000
         self.BONEFLAG_IS_EXTERNAL_PARENT_DEFORM = 0x2000
-    
+
     def copy(self):
         return cPickle.loads(cPickle.dumps(self, -1))
 
@@ -454,7 +454,7 @@ class Morph:
 
     def copy(self):
         return cPickle.loads(cPickle.dumps(self, -1))
-    
+
     # パネルの名称取得
     def get_panel_name(self):
         if self.panel == 1:
@@ -517,19 +517,19 @@ cdef class RigidBody:
 
     def copy(self):
         return cPickle.loads(cPickle.dumps(self, -1))
-    
+
     # 剛体: ボーン追従
     def isModeStatic(self):
         return self.mode == 0
-    
+
     # 剛体: 物理演算
     def isModeDynamic(self):
         return self.mode == 1
-    
+
     # 剛体: 物理演算 + Bone位置合わせ
     def isModeMix(self):
         return self.mode == 2
-    
+
     def get_obb(self, fno, bone_pos, bone_matrix, is_aliginment, is_arm_left):
         # 剛体の形状別の衝突判定用
         if self.shape_type == self.SHAPE_SPHERE:
@@ -556,7 +556,7 @@ cdef class RigidBodyParam:
 
     def copy(self):
         return cPickle.loads(cPickle.dumps(self, -1))
-            
+
 # OBB（有向境界ボックス：Oriented Bounding Box）
 cdef class OBB:
     def __init__(self, fno, shape_size, shape_position, shape_rotation, bone_name, bone_pos, bone_matrix, is_aliginment, is_arm_left, is_arm_upper, is_small, is_init_rot):
@@ -593,7 +593,7 @@ cdef class OBB:
     # OBBとの衝突判定
     cpdef tuple get_collistion(self, MVector3D point, MVector3D root_global_pos, float max_length, float base_size):
         pass
-    
+
 # 球剛体
 cdef class Sphere(OBB):
     def __init__(self, *args):
@@ -789,7 +789,7 @@ cdef class Box(OBB):
             x = self.shape_size.x() * max_ratio * self.h_sign
             z_plus = -self.shape_size.z() * max_ratio * 1
             z_minus = -self.shape_size.z() * max_ratio * -1
-            
+
             # X方向にOBBの境界に持って行った場合の位置
             x_base = self.rotated_matrix * MVector3D(x, 0, 0)
             # Z方向に同上
@@ -857,7 +857,7 @@ cdef class Box(OBB):
 
             logger.debug("f: %s, xd: %s, zd: %s, l: %s, xl: %s, zl: %s, xr: %s, zrp: %s, zrm: %s", \
                          self.fno, x_distance, z_plus_distance, local_point.to_log(), new_x_local.to_log(), new_z_plus_local.to_log(), rep_x_collision_vec, rep_z_plus_collision_vec, rep_z_minus_collision_vec)
-        
+
         return (collision, near_collision, x_distance, z_plus_distance, z_minus_distance, rep_x_collision_vec, rep_z_plus_collision_vec, rep_z_minus_collision_vec)
 
 # カプセル剛体
@@ -1007,7 +1007,7 @@ cdef class Capsule(OBB):
                             "local_point: [%s], d: %s, new_x_local: %s, new_z_plus_local: %s, rep_x_collision_vec: %s, rep_z_plus_collision_vec: %s, rep_z_minus_collision_vec: %s", \
                             self.fno, local_point.y() / y, y_theta, sin_y_theta, x_theta, sin_x_theta, z_plus_theta, sin_z_plus_theta, x_distance, z_plus_distance, local_point.to_log(), d, \
                             new_x_local.to_log(), new_z_plus_local.to_log(), rep_x_collision_vec, rep_z_plus_collision_vec, rep_z_minus_collision_vec)
-        
+
         # 3方向の間に点が含まれていたら衝突あり
         return (collision, near_collision, x_distance, z_plus_distance, z_minus_distance, rep_x_collision_vec, rep_z_plus_collision_vec, rep_z_minus_collision_vec)
 
@@ -1106,12 +1106,12 @@ cdef class PmxModel:
         self.elbow_entity_vertex = {}
         # 左右ひじ手首中間頂点
         self.elbow_middle_entity_vertex = {}
-    
+
     # ローカルX軸の取得
     def get_local_x_axis(self, bone_name: str):
         if bone_name not in self.bones:
             return MVector3D()
-        
+
         bone = self.bones[bone_name]
         to_pos = MVector3D()
 
@@ -1120,7 +1120,7 @@ cdef class PmxModel:
             fixed_x_axis = bone.fixed_axis.normalized()
         else:
             fixed_x_axis = MVector3D()
-        
+
         from_pos = self.bones[bone.name].position
         if not bone.getConnectionFlag() and bone.tail_position > MVector3D():
             # 表示先が相対パスの場合、保持
@@ -1136,7 +1136,7 @@ cdef class PmxModel:
             #     if b.parent_index == bone.index and self.bones[self.bone_indexes[b.index]].position != bone.position:
             #         to_pos = self.bones[self.bone_indexes[b.index]].position
             #         break
-        
+
         logger.test("get_local_x_axis: from: %s, to: %s, tail:%s-[%s]", from_pos, to_pos, bone.tail_index, bone.tail_position)
         # 軸制限の指定が無い場合、子の方向
         x_axis = (to_pos - from_pos).normalized()
@@ -1146,7 +1146,7 @@ cdef class PmxModel:
             x_axis = -fixed_x_axis
 
         return x_axis
-    
+
     def get_local_x_qq(self, bone_name: str, base_local_axis=None):
         local_axis_qq = MQuaternion()
 
@@ -1160,7 +1160,7 @@ cdef class PmxModel:
         logger.debug_info("get_local_x_qq: local_axis[%s], base_local_axis[%s], local_axis_qq[%s]", local_axis.to_log(), base_local_axis.to_log(), local_axis_qq.toEulerAngles4MMD().to_log())
 
         return local_axis_qq
-    
+
     # 腕のスタンスの違い
     def calc_arm_stance(self, from_bone_name: str, to_bone_name=None):
         default_pos = MVector3D(1, 0, 0) if "左" in from_bone_name else MVector3D(-1, 0, 0)
@@ -1174,7 +1174,7 @@ cdef class PmxModel:
         if from_bone_name in self.bones:
             fv = self.bones[from_bone_name]
             from_pos = fv.position
-            
+
             if to_bone_name in self.bones:
                 # TOが指定されている場合、ボーン位置を保持
                 to_pos = self.bones[to_bone_name].position
@@ -1210,20 +1210,20 @@ cdef class PmxModel:
 
         target_bones = ["左腕", "左ひじ", "左手首", "右腕", "右ひじ", "右手首"]
 
-        cannot_sizing = "腕系処理をスキップします。\n腕系処理（腕スタンス補正・捩り分散・接触回避・位置合わせ）を実行したい場合、\n腕タブのチェックスキップFLGをONにして再実行してください。"
+        cannot_sizing = "팔 계통 처리를 건너뜁니다.\n팔 계통 처리(팔 자세 보정, 비틀림 분산, 접촉 회피, 위치 맞춤)를 수행하고자 하는 경우, \n팔 탭의 체크 스킵 FLG를 ON하여 재실행하십시오."
 
         if not set(target_bones).issubset(self.bones.keys()):
-            logger.warning("腕・ひじ・手首の左右ボーンが揃ってないため、%s\nモデル: %s", cannot_sizing, self.name, decoration=MLogger.DECORATION_BOX)
+            logger.warning("팔/팔꿈치/손목 좌우본이 갖추어져 있지 않아 %sn모델: %s", cannot_sizing, self.name, decoration=MLogger.DECORATION_BOX)
             return False
-        
+
         for bone_name in self.bones.keys():
             if ("腕IK" in bone_name or "腕ＩＫ" in bone_name or "うでIK" in bone_name or "うでＩＫ" in bone_name or "腕XIK" in bone_name):
                 # 腕IKが入ってて、かつそれが表示されてる場合、NG
-                logger.warning("モデルに「腕IK」に類するボーンが含まれているため、%s\nモデル: %s", cannot_sizing, self.name, decoration=MLogger.DECORATION_BOX)
+                logger.warning("모델에 '팔 IK'와 유사한 본이 포함되어 있기 때문에 %s\n 모델:%s", cannot_sizing, self.name, decoration=MLogger.DECORATION_BOX)
                 return False
 
         return True
-    
+
     # ボーンリンク生成
     def create_link_2_top_lr(self, *target_bone_types, **kwargs):
         is_defined = kwargs["is_defined"] if "is_defined" in kwargs else True
@@ -1245,22 +1245,22 @@ cdef class PmxModel:
 
             if links and target_bone_name in links.all():
                 reversed_links = BoneLinks()
-                
+
                 # リンクがある場合、反転させて返す
                 for lname in reversed(links.all()):
                     reversed_links.append(links.get(lname))
 
                 return reversed_links
-        
+
         # 最後まで回しても取れなかった場合、エラー
-        raise SizingException("ボーンリンクの生成に失敗しました。モデル「%s」に「%s」のボーンがあるか確認してください。" % (self.name, ",".join(target_bone_names)))
+        raise SizingException("본 링크 생성에 실패했습니다.모델 %s에 %s 본이 있는지 확인하십시오." % (self.name, ",".join(target_bone_names)))
 
     # リンク生成
     def create_link_2_top(self, target_bone_name: str, links: BoneLinks, is_defined: bool):
         if not links:
             # まだリンクが生成されていない場合、順序保持辞書生成
             links = BoneLinks()
-        
+
         if target_bone_name not in self.bones and target_bone_name not in self.PARENT_BORN_PAIR:
             # 開始ボーン名がなければ終了
             return links
@@ -1277,8 +1277,8 @@ cdef class PmxModel:
         if is_defined:
             # 定義済みの場合
             if target_bone_name not in self.PARENT_BORN_PAIR:
-                raise SizingException("ボーンリンクの生成に失敗しました。モデル「%s」の「%s」ボーンが準標準までの構造ではない可能性があります。" % (self.name, target_bone_name))
-                
+                raise SizingException("본 링크 생성에 실패했습니다.모델 '%s'의 '%s'본이 준표준까지의 구조는 아닐 수 있습니다." % (self.name, target_bone_name))
+
             for pname in self.PARENT_BORN_PAIR[target_bone_name]:
                 # 親子関係のボーンリストから親ボーンが存在した場合
                 if pname in self.bones:
@@ -1293,22 +1293,22 @@ cdef class PmxModel:
         if not parent_name:
             # 親ボーンがボーンインデックスリストになければ終了
             return links
-        
+
         logger.test("target_bone_name: %s. parent_name: %s, start_type_bone: %s", target_bone_name, parent_name, start_type_bone)
-        
+
         # 親をたどる
         try:
             return self.create_link_2_top(parent_name, links, is_defined)
         except RecursionError:
-            raise SizingException("ボーンリンクの生成に失敗しました。\nモデル「{0}」の「{1}」ボーンで以下を確認してください。\n" \
-                                  + "・同じ名前のボーンが複数ないか（ボーンのINDEXがズレるため、サイジングに失敗します）\n" \
-                                  + "・親ボーンに自分の名前と同じ名前のボーンが指定されていないか\n※ PMXEditorの「PMXデータの状態検証」から確認できます。".format(self.name, target_bone_name))
-    
+            raise SizingException("본 링크 생성에 실패했습니다.\n모델 {0}의 {1} 본에서 다음을 확인하십시오.\n" \
+                                  + "· 같은 이름의 본이 여러 개 없거나(본의 INDEX가 어긋나기 때문에 사이징에 실패합니다)\n" \
+                                  + "· 부모본에 자신의 이름과 같은 이름의 본이 지정되지 않았는지\n※PMXEditor의 'PMX 데이터 상태 검증'에서 확인할 수 있습니다.".format(self.name, target_bone_name))
+
     # 子孫ボーンリスト取得
     def get_child_bones(self, target_bone: Bone, bone_list=None):
         if not bone_list:
             bone_list = []
-        
+
         child_bone_list = []
 
         for child_bone in self.bones.values():
@@ -1442,7 +1442,7 @@ cdef class PmxModel:
         "左目": ["頭"],
         "右目": ["頭"]
     }
-    
+
     # 頭頂の頂点を取得
     def get_head_top_vertex(self):
         bone_name_list = ["頭"]
@@ -1468,9 +1468,9 @@ cdef class PmxModel:
                     return Vertex(-1, self.bones["首"].position.copy() + 3, MVector3D(), MVector2D(), [], Bdef1(-1), -1)
                 else:
                     return Vertex(-1, MVector3D(), MVector3D(), MVector2D(), [], Bdef1(-1), -1)
-        
+
         return up_max_vertex
-    
+
     # 頭用剛体生成
     def get_head_rigidbody(self):
         bone_name_list = ["頭"]
@@ -1513,7 +1513,7 @@ cdef class PmxModel:
             head_rigidbody.is_arm_upper = True
 
             return head_rigidbody
-        
+
         return None
 
     # つま先の頂点を取得
@@ -1535,7 +1535,7 @@ cdef class PmxModel:
             if ((direction == "右" and bv.position.x() < 0) or (direction == "左" and bv.position.x() > 0)) \
                and bv.position.y() <= self.bones[target_bone_name].position.y() and direction in bk:
                 bone_name_list.append(bk)
-        
+
         if len(bone_name_list) == 0:
             # ウェイトボーンがない場合、つま先ボーン系の位置
             if "{0}つま先".format(direction) in self.bones:
@@ -1566,7 +1566,7 @@ cdef class PmxModel:
                 return Vertex(-1, self.bones["{0}足ＩＫ".format(direction)].position, MVector3D(), MVector2D(), [], Bdef1(-1), -1)
             else:
                 return Vertex(-1, MVector3D(), MVector3D(), MVector2D(), [], Bdef1(-1), -1)
-        
+
         return front_max_vertex
 
     # 足底の頂点を取得
@@ -1588,7 +1588,7 @@ cdef class PmxModel:
             if ((direction == "右" and bv.position.x() < 0) or (direction == "左" and bv.position.x() > 0)) \
                and bv.position.y() <= self.bones[target_bone_name].position.y() and direction in bk:
                 bone_name_list.append(bk)
-        
+
         if len(bone_name_list) == 0:
             # ウェイトボーンがない場合、足ＩＫの位置
             if "{0}足ＩＫ".format(direction) in self.bones:
@@ -1607,7 +1607,7 @@ cdef class PmxModel:
                 return Vertex(-1, self.bones["{0}足ＩＫ".format(direction)].position, MVector3D(), MVector2D(), [], Bdef1(-1), -1)
             else:
                 return Vertex(-1, MVector3D(), MVector3D(), MVector2D(), [], Bdef1(-1), -1)
-        
+
         return multi_max_vertex
 
     # 手のひらの厚みをはかる頂点を取得
@@ -1622,7 +1622,7 @@ cdef class PmxModel:
         else:
             # 手首ボーンがない場合、処理終了
             return Vertex(-1, MVector3D(), MVector3D(), MVector2D(), [], Bdef1(-1), -1)
-        
+
         # 腕の傾き（正確にはひじ以降の傾き）
         _, arm_stance_qq = self.calc_arm_stance("{0}ひじ".format(direction), "{0}手首".format(direction))
 
@@ -1642,7 +1642,7 @@ cdef class PmxModel:
             if not down_max_vertex:
                 # それでも取れなければ手首位置
                 return Vertex(-1, self.bones["{0}手首".format(direction)].position.copy(), MVector3D(), MVector2D(), [], Bdef1(-1), -1)
-        
+
         return down_max_vertex
 
     # 指先実体をはかる頂点を取得
@@ -1656,7 +1656,7 @@ cdef class PmxModel:
         else:
             # 指ボーンがない場合、処理終了
             return Vertex(-1, MVector3D(), MVector3D(), MVector2D(), [], Bdef1(-1), -1)
-        
+
         # 腕の傾き（正確にはひじ以降の傾き）
         _, arm_stance_qq = self.calc_arm_stance("{0}手首".format(direction), finger_name)
 
@@ -1664,10 +1664,10 @@ cdef class PmxModel:
             back_max_pos, back_max_vertex, front_max_pos, front_max_vertex, multi_max_pos, multi_max_vertex \
             = self.get_bone_end_vertex(bone_name_list, self.def_calc_vertex_pos_horizonal, def_is_target=None, \
                                        def_is_multi_target=None, multi_target_default_val=None, qq4calc=arm_stance_qq)
-        
+
         if direction == "左" and right_max_vertex:
             return right_max_vertex
-        
+
         if direction == "右" and left_max_vertex:
             return left_max_vertex
 
@@ -1689,7 +1689,7 @@ cdef class PmxModel:
         else:
             # ひじボーンがない場合、処理終了
             return Vertex(-1, MVector3D(), MVector3D(), MVector2D(), [], Bdef1(-1), -1)
-        
+
         # 腕の傾き（正確にはひじ以降の傾き）
         _, arm_stance_qq = self.calc_arm_stance("{0}腕".format(direction), "{0}ひじ".format(direction))
 
@@ -1709,7 +1709,7 @@ cdef class PmxModel:
             if not down_max_vertex:
                 # それでも取れなければひじ位置
                 return Vertex(-1, self.bones["{0}ひじ".format(direction)].position.copy(), MVector3D(), MVector2D(), [], Bdef1(-1), -1)
-        
+
         return down_max_vertex
 
     # 頂点位置を返す（オリジナルそのまま）
@@ -1728,11 +1728,11 @@ cdef class PmxModel:
     # 最も底面でかつ前面にある頂点であるか
     def def_is_multi_target_down_front(self, multi_max_pos: MVector3D, v_pos: MVector3D):
         return v_pos.y() <= multi_max_pos.y() + 0.1 and v_pos.z() <= multi_max_pos.z()
-    
+
     # 最も底面でかつ前面にある頂点であるか
     def def_is_multi_target_down_front_sole(self, multi_max_pos: MVector3D, v_pos: MVector3D):
         return v_pos.y() <= multi_max_pos.y() + 0.1 and v_pos.z() <= multi_max_pos.z()
-    
+
     # 指定ボーンにウェイトが乗っている頂点とそのINDEX
     def get_bone_end_vertex(self, bone_name_list, def_calc_vertex_pos, def_is_target=None, def_is_multi_target=None, multi_target_default_val=None, qq4calc=None):
         # 指定ボーンにウェイトが乗っているボーンINDEXリスト
@@ -1742,7 +1742,7 @@ cdef class PmxModel:
                 bone_idx_list.append(bv.index)
 
         if len(bone_idx_list) == 0:
-            logger.test("bone_name: %s, ウェイト頂点がない", bone_name_list)
+            logger.test("bone_name: %s, 웨이트 정점이 없습니다.", bone_name_list)
             # ウェイトボーンがない場合、初期値
             return MVector3D(), None, MVector3D(), None, MVector3D(), None, MVector3D(), None, MVector3D(), None, MVector3D(), None, MVector3D(), None
 
@@ -1804,7 +1804,7 @@ cdef class PmxModel:
                         # 指定ボーンにウェイトが乗っていて、かつ最下の頂点より奥の場合、保持
                         back_max_pos = v_pos
                         back_max_vertex = v
-                    
+
                     if def_is_multi_target and def_is_multi_target(multi_max_pos, v_pos):
                         multi_max_pos = v_pos
                         multi_max_vertex = v
@@ -1816,10 +1816,10 @@ cdef class PmxModel:
     def get_effective_value(cls, v):
         if math.isnan(v):
             return 0
-        
+
         if math.isinf(v):
             return 0
-        
+
         return v
 
     @classmethod

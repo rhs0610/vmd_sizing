@@ -118,17 +118,17 @@ cdef class VmdBoneFrame:
         self.org_rotation = MQuaternion()
         self.interpolation = [20, 20, 0, 0, 20, 20, 20, 20, 107, 107, 107, 107, 107, 107, 107, 107, 20, 20, 20, 20, 20, 20, 20, 107, 107, 107, 107, 107, 107, 107, 107, 0, 20, 20, 20, 20, 20, 20, 107, 107, 107, 107, 107, 107, 107, 107, 0, 0, 20, 20, 20, 20, 20, 107, 107, 107, 107, 107, 107, 107, 107, 0, 0, 0] # noqa
         self.org_interpolation = [20, 20, 0, 0, 20, 20, 20, 20, 107, 107, 107, 107, 107, 107, 107, 107, 20, 20, 20, 20, 20, 20, 20, 107, 107, 107, 107, 107, 107, 107, 107, 0, 20, 20, 20, 20, 20, 20, 107, 107, 107, 107, 107, 107, 107, 107, 0, 0, 20, 20, 20, 20, 20, 107, 107, 107, 107, 107, 107, 107, 107, 0, 0, 0] # noqa
-        # 登録対象であるか否か
+        # 등록対象であるか否か
         self.key = False
-        # VMD読み込み処理で読み込んだキーか
+        # VMD読み込み処理で読み込んだ키か
         self.read = False
         # 接触回避の方向
         self.avoidance = ""
-    
+
     def set_name(self, name):
         self.name = name
         self.bname = b'' if not name else name.encode('cp932').decode('shift_jis').encode('shift_jis')[:15].ljust(15, b'\x00')
-    
+
     def copy(self):
         bf = VmdBoneFrame(self.fno)
         bf.name = self.name
@@ -168,11 +168,11 @@ cdef class VmdMorphFrame:
         self.bname = b''
         self.fno = fno
         self.ratio = 0
-        # 登録対象であるか否か
+        # 등록対象であるか否か
         self.key = False
-        # VMD読み込み処理で読み込んだキーか
+        # VMD読み込み処理で読み込んだ키か
         self.read = False
-    
+
     def write(self, fout):
         if not self.bname:
             self.bname = self.name.encode('cp932').decode('shift_jis').encode('shift_jis')[:15].ljust(15, b'\x00')   # 15文字制限
@@ -193,7 +193,7 @@ cdef class VmdMorphFrame:
     def set_name(self, name):
         self.name = name
         self.bname = b'' if not name else name.encode('cp932').decode('shift_jis').encode('shift_jis')[:15].ljust(15, b'\x00')
-    
+
     def __str__(self):
         return "<VmdMorphFrame name:{0}, fno:{1}, ratio:{2}".format(self.name, self.fno, self.ratio)
 
@@ -292,7 +292,7 @@ class VmdShowIkFrame:
                 k.bname = k.name.encode('cp932').decode('shift_jis').encode('shift_jis')[:20].ljust(20, b'\x00')   # 20文字制限
             fout.write(k.bname)
             fout.write(struct.pack('b', k.onoff))
-        
+
 
 # https://blog.goo.ne.jp/torisu_tetosuki/e/bc9f1c4d597341b394bd02b64597499d
 # https://w.atwiki.jp/kumiho_k/pages/15.html
@@ -322,18 +322,18 @@ cdef class VmdMotion:
         self.showiks = []
         # ハッシュ値
         self.digest = None
-    
+
     def regist_full_bf(self, data_set_no: int, bone_name_list: list, offset=1, is_key=True):
         self.c_regist_full_bf(data_set_no, bone_name_list, offset, is_key)
 
     cdef c_regist_full_bf(self, int data_set_no, list bone_name_list, int offset, bint is_key):
-        # 指定された全部のボーンのキーフレ取得
+        # 指定された全部のボーンの키 프레임取得
         cdef list fnos = self.get_bone_fnos(*bone_name_list)
 
         if len(fnos) == 0:
             return
 
-        # オフセット単位でキーフレ計算
+        # オフセット単位で키 프레임計算
         fnos.extend(x for x in range(fnos[-1])[::offset])
         # 重複を除いて再計算
         fnos = sorted(list(set(fnos)))
@@ -342,22 +342,22 @@ cdef class VmdMotion:
         cdef int fno, prev_sep_fno
         cdef VmdBoneFrame bf
 
-        # 指定ボーン名でキーフレ登録
+        # 指定ボーン名で키 프레임등록
         for bone_name in bone_name_list:
             prev_sep_fno = 0
 
             for fno in fnos:
                 bf = self.c_calc_bf(bone_name, fno, is_key=False, is_read=False, is_reset_interpolation=False)
-                # 無効化のままの場合、キーをOFFにしておく
+                # 無効化のままの場合、키をOFFにしておく
                 key = True if is_key or bf.read else False
                 self.c_regist_bf(bf, bone_name, fno, copy_interpolation=False, key=key)
 
                 if fno // 500 > prev_sep_fno and fnos[-1] > 0:
                     if data_set_no == 0:
-                        logger.info("-- %sフレーム目:終了(%s％)【全打ち - %s】", fno, round((fno / fnos[-1]) * 100, 3), bone_name)
+                        logger.info("-- %s프레임째:종료(%s％)【전체 맞음 - %s】", fno, round((fno / fnos[-1]) * 100, 3), bone_name)
                         prev_sep_fno = fno // 500
                     elif data_set_no > 0:
-                        logger.info("-- %sフレーム目:終了(%s％)【No.%s - 全打ち - %s】", fno, round((fno / fnos[-1]) * 100, 3), data_set_no, bone_name)
+                        logger.info("-- %s프레임째:종료(%s％)【No.%s - 전체 맞음 - %s】", fno, round((fno / fnos[-1]) * 100, 3), data_set_no, bone_name)
                         prev_sep_fno = fno // 500
 
     def get_differ_fnos(self, data_set_no: int, bone_name_list: list, limit_degrees: float, limit_length: float):
@@ -378,12 +378,12 @@ cdef class VmdMotion:
 
         prev_sep_fno = 0
 
-        # 有効キーを取得
+        # 有効키を取得
         bone_fnos = self.get_bone_fnos(*bone_name_list, is_key=True)
 
         if len(bone_fnos) <= 0:
             return []
-        
+
         # 比較対象bf
         rot_diff = 0
         mov_diff = 0
@@ -395,40 +395,40 @@ cdef class VmdMotion:
                 bf = self.c_calc_bf(bone_name, fno, is_key=False, is_read=False, is_reset_interpolation=False)
 
                 if bf.read:
-                    # 読み込みキーである場合、必ず処理対象に追加
+                    # 読み込み키である場合、必ず処理対象に추가
                     fnos.append(fno)
                     rot_diff = 0
                     mov_diff = 0
                 else:
-                    # 読み込みキーではない場合、処理対象にするかチェック
+                    # 読み込み키ではない場合、処理対象にするかチェック
                     if fno - 1 in fnos:
-                        # 前のキーがある場合、とりあえずスルー
+                        # 前の키がある場合、とりあえずスルー
                         continue
 
-                    # 読み込みキーとの差
+                    # 読み込み키との差
                     rot_diff += abs(prev_bf.rotation.toDegree() - bf.rotation.toDegree())
                     if rot_diff > limit_degrees and limit_degrees > 0:
-                        # 前と今回の内積の差が指定度数より離れている場合、追加
-                        logger.debug("★ 追加 set: %s, %s, f: %s, diff: %s", data_set_no, bone_name, fno, rot_diff)
+                        # 前と今回の内積の差が指定度数より離れている場合、추가
+                        logger.debug("★ 추가 set: %s, %s, f: %s, diff: %s", data_set_no, bone_name, fno, rot_diff)
                         fnos.append(fno)
                         rot_diff = 0
                     elif limit_length > 0:
-                        # 読み込みキーとの差
+                        # 読み込み키との差
                         mov_diff += prev_bf.position.distanceToPoint(bf.position)
                         if mov_diff > limit_length:
-                            # 前と今回の移動量の差が指定値より離れている場合、追加
-                            logger.test("★ 追加 set: %s, %s, f: %s, diff: %s", data_set_no, bone_name, fno, mov_diff)
+                            # 前と今回の이동量の差が指定値より離れている場合、추가
+                            logger.test("★ 추가 set: %s, %s, f: %s, diff: %s", data_set_no, bone_name, fno, mov_diff)
                             fnos.append(fno)
                             mov_diff = 0
                     else:
-                        logger.test("× 追加なし set: %s, %s, f: %s, rot_diff: %s, mov_diff: %s", data_set_no, bone_name, fno, rot_diff, mov_diff)
+                        logger.test("× 추 가없는 set: %s, %s, f: %s, rot_diff: %s, mov_diff: %s", data_set_no, bone_name, fno, rot_diff, mov_diff)
 
                 if fno // 2000 > prev_sep_fno and bone_fnos[-1] > 0:
                     if data_set_no > 0:
-                        logger.info("-- %sフレーム目:終了(%s％)【No.%s - キーフレ追加準備 - %s】", fno, round((fno / bone_fnos[-1]) * 100, 3), data_set_no, bone_name)
+                        logger.info("-- %s프레임째: 종료(%s％)【No.%s - 키 프레임 추가 준비 - %s】", fno, round((fno / bone_fnos[-1]) * 100, 3), data_set_no, bone_name)
                         prev_sep_fno = fno // 2000
                     else:
-                        logger.info("-- %sフレーム目:終了(%s％)【キーフレ追加準備 - %s】", fno, round((fno / bone_fnos[-1]) * 100, 3), bone_name)
+                        logger.info("-- %s프레임째: 종료(%s％)【키 프레임 추가 준비 - %s】", fno, round((fno / bone_fnos[-1]) * 100, 3), bone_name)
                         prev_sep_fno = fno // 2000
 
         # 重複を除いて再計算
@@ -441,14 +441,14 @@ cdef class VmdMotion:
     cdef c_smooth_bf(self, int data_set_no, str bone_name, bint is_rot, bint is_mov, double limit_degrees, int start_fno, int end_fno, bint is_show_log):
         cdef list fnos
 
-        # キーフレを取得する
+        # 키 프레임を取得する
         if start_fno < 0 and end_fno < 0:
             # 範囲指定がない場合、全範囲
             fnos = self.get_bone_fnos(bone_name)
         else:
             # 範囲指定がある場合はその範囲内だけ
             fnos = self.get_bone_fnos(bone_name, start_fno=start_fno, end_fno=end_fno)
-        
+
         cdef double limit_radians = radians(limit_degrees)
 
         cdef int prev_sep_fno = 0
@@ -475,15 +475,15 @@ cdef class VmdMotion:
                     diff = np.abs(np.diff([prev_next_dot, now_next_dot]))
                     logger.test("set: %s, %s, f: %s, diff: %s, prev_next_dot: %s, now_next_dot: %s", data_set_no, bone_name, fno, diff, prev_next_dot, now_next_dot)
 
-                    # 前後と自分の内積の差が一定以上の場合、円滑化
+                    # 前後と自分の内積の差が一定以上の場合、유연화
                     if prev_next_dot > now_next_dot and diff > limit_radians:
-                        logger.debug("★ 円滑化 set: %s, %s, f: %s, diff: %s, prev_next_dot: %s, now_next_dot: %s", \
+                        logger.debug("★ 유연화 set: %s, %s, f: %s, diff: %s, prev_next_dot: %s, now_next_dot: %s", \
                                      data_set_no, bone_name, fno, diff, prev_next_dot, now_next_dot)
 
                         now_bf.rotation = MQuaternion.slerp(prev_bf.rotation, next_bf.rotation, ((now_bf.fno - prev_bf.fno) / (next_bf.fno - prev_bf.fno)))
-                
+
                 if is_show_log and data_set_no > 0 and fno // 2000 > prev_sep_fno and fnos[-1] > 0:
-                    logger.info("-- %sフレーム目:終了(%s％)【No.%s - 円滑化 - %s】", fno, round((fno / fnos[-1]) * 100, 3), data_set_no, bone_name)
+                    logger.info("-- %s프레임째: 종료(%s％)【No.%s - 유연화 - %s】", fno, round((fno / fnos[-1]) * 100, 3), data_set_no, bone_name)
                     prev_sep_fno = fno // 2000
 
     def smooth_filter_bf(self, data_set_no: int, bone_name: str, is_rot: bint, is_mov: bint, loop=1, \
@@ -502,7 +502,7 @@ cdef class VmdMotion:
         for n in range(loop):
             prev_sep_fno = 0
 
-            # キーフレを取得する
+            # 키 프레임を取得する
             if start_fno < 0 and end_fno < 0:
                 # 範囲指定がない場合、全範囲
                 active_fnos = self.get_bone_fnos(bone_name)
@@ -528,16 +528,16 @@ cdef class VmdMotion:
                     for fno in range(inf_start_fno + 1, inf_end_fno):
                         now_bf = self.c_calc_bf(bone_name, fno, is_key=False, is_read=False, is_reset_interpolation=False)
                         now_bf.position = MVector3D(mxfilter(now_bf.position.x()), myfilter(now_bf.position.y()), mzfilter(now_bf.position.z()))
-                        # 補間曲線分割なしでそのまま登録
+                        # 보간 곡선分割なしでそのまま등록
                         self.bones[bone_name][fno] = now_bf
 
                         if is_show_log and fno // 2000 > prev_sep_fno and fnos[-1] > 0:
                             if data_set_no > 0:
-                                logger.info("-- %sフレーム目:終了(%s％)【No.%s - 移動フィルタリング(%s) - %s】", fno, round((fno / fnos[-1]) * 100, 3), data_set_no, (n + 1), bone_name)
+                                logger.info("-- %s프레임째: 종료(%s％)【No.%s - 이동 필터링(%s) - %s】", fno, round((fno / fnos[-1]) * 100, 3), data_set_no, (n + 1), bone_name)
                             else:
-                                logger.info("-- %sフレーム目:終了(%s％)【移動フィルタリング(%s) - %s】", fno, round((fno / fnos[-1]) * 100, 3), (n + 1), bone_name)
+                                logger.info("-- %s프레임째: 종료(%s％)【이동 필터링(%s) - %s】", fno, round((fno / fnos[-1]) * 100, 3), (n + 1), bone_name)
                             prev_sep_fno = fno // 2000
-            
+
             if is_rot:
                 prev_sep_fno = 0
 
@@ -549,19 +549,19 @@ cdef class VmdMotion:
                         now_bf = self.c_calc_bf(bone_name, fno, is_key=False, is_read=False, is_reset_interpolation=False)
                         # まず前後の中間をそのまま求める
                         filterd_qq = MQuaternion.slerp(start_bf.rotation, end_bf.rotation, (fno - inf_start_fno) / (inf_end_fno - inf_start_fno))
-                        # 現在の回転にも少し近づける
+                        # 現在の회전にも少し近づける
                         now_bf.rotation = MQuaternion.slerp(filterd_qq, now_bf.rotation, 0.8)
-                        # 補間曲線分割なしでそのまま登録
+                        # 보간 곡선分割なしでそのまま등록
                         self.bones[bone_name][fno] = now_bf
 
                     if is_show_log and inf_start_fno // 2000 > prev_sep_fno and fnos[-1] > 0:
                         if data_set_no > 0:
-                            logger.info("-- %sフレーム目:終了(%s％)【No.%s - 回転フィルタリング(%s) - %s】", inf_start_fno, round((inf_start_fno / fnos[-1]) * 100, 3), data_set_no, (n + 1), bone_name)
+                            logger.info("-- %s프레임째: 종료(%s％)【No.%s - 회전 필터링(%s) - %s】", inf_start_fno, round((inf_start_fno / fnos[-1]) * 100, 3), data_set_no, (n + 1), bone_name)
                         else:
-                            logger.info("-- %sフレーム目:終了(%s％)【回転フィルタリング(%s) - %s】", inf_start_fno, round((inf_start_fno / fnos[-1]) * 100, 3), (n + 1), bone_name)
+                            logger.info("-- %s프레임째: 종료(%s％)【회전 필터링(%s) - %s】", inf_start_fno, round((inf_start_fno / fnos[-1]) * 100, 3), (n + 1), bone_name)
                         prev_sep_fno = inf_start_fno // 2000
-            
-    # 無効なキーを物理削除する
+
+    # 無効な키を物理삭제する
     def remove_unkey_bf(self, data_set_no: int, bone_name: str):
         for fno in self.get_bone_fnos(bone_name):
             bf = self.c_calc_bf(bone_name, fno, is_key=False, is_read=False, is_reset_interpolation=False)
@@ -569,19 +569,19 @@ cdef class VmdMotion:
             if fno in self.bones[bone_name] and not bf.key:
                 del self.bones[bone_name][fno]
 
-    # 指定ボーンの不要キーを削除する
+    # 指定ボーンの불필요키を삭제する
     # 変曲点を求める
     # https://teratail.com/questions/162391
     def remove_unnecessary_bf(self, data_set_no: int, bone_name: str, is_rot: bint, is_mov: bint, \
                                      offset=0, rot_diff_limit=0.001, mov_diff_limit=0.1, start_fno=-1, end_fno=-1, is_show_log=True, is_force=False, is_sub_remove=False):
-        self.c_remove_unnecessary_bf(data_set_no, bone_name, is_rot, is_mov, offset, rot_diff_limit, mov_diff_limit, start_fno, end_fno, is_show_log, False, is_sub_remove, 
+        self.c_remove_unnecessary_bf(data_set_no, bone_name, is_rot, is_mov, offset, rot_diff_limit, mov_diff_limit, start_fno, end_fno, is_show_log, False, is_sub_remove,
                                      None, None, None, None, None)
 
-    # 指定ボーンの不要キーを削除する
+    # 指定ボーンの불필요키を삭제する
     # 変曲点を求める
     # https://teratail.com/questions/162391
     cdef list c_remove_unnecessary_bf(self, int data_set_no, str bone_name, bint is_rot, bint is_mov, \
-                                      double offset, double rot_diff_limit, double mov_diff_limit, int r_start_fno, int r_end_fno, bint is_show_log, bint is_force, bint is_sub_remove, 
+                                      double offset, double rot_diff_limit, double mov_diff_limit, int r_start_fno, int r_end_fno, bint is_show_log, bint is_force, bint is_sub_remove,
                                       dict r_dict, dict mx_dict, dict my_dict, dict mz_dict, list infections):
         cdef int prev_sep_fno = 0
         cdef list active_fnos
@@ -589,7 +589,7 @@ cdef class VmdMotion:
 
         logger.test("self.bones[bone_name].keys(): %s", self.bones[bone_name].keys())
 
-        # キーフレを取得する
+        # 키 프레임を取得する
         if r_start_fno < 0 and r_end_fno < 0:
             # 範囲指定がない場合、全範囲
             active_fnos = self.get_bone_fnos(bone_name, is_key=True)
@@ -599,7 +599,7 @@ cdef class VmdMotion:
 
         if len(active_fnos) <= 2:
             return
-        
+
         fnos = np.array(list(range(active_fnos[0], active_fnos[-1] + 1)), dtype=np.int)
 
         logger.test("remove_unnecessary_bf fnos: %s, %s, active: %s", bone_name, fnos, active_fnos)
@@ -631,7 +631,7 @@ cdef class VmdMotion:
         cdef bint is_prev_success = False
         cdef dict rconfig = {"freq": 30, "mincutoff": 5, "beta": 1, "dcutoff": 5}
         cdef dict mconfig = {"freq": 30, "mincutoff": 5, "beta": 1, "dcutoff": 5}
-        
+
         while inf_start_fno <= active_fnos[-1] and iidx < len(infections):
             rot_values = [0]
             mx_values = []
@@ -651,7 +651,7 @@ cdef class VmdMotion:
 
             next_bf = None
 
-            # 単調増加としてキーを結合してみる
+            # 単調増加として키を結合してみる
             (joined_rot_bzs, rot_inflection) = MBezierUtils.join_value_2_bezier(inf_end_fno, f'{bone_name}R', rot_values, \
                                                                                 offset=offset, diff_limit=rot_diff_limit) if is_rot else (True, [])
             (joined_mx_bzs, mx_inflection) = MBezierUtils.join_value_2_bezier(inf_end_fno, f'{bone_name}MX', mx_values, \
@@ -664,65 +664,65 @@ cdef class VmdMotion:
             if joined_rot_bzs and joined_mx_bzs and joined_my_bzs and joined_mz_bzs:
                 next_bf = self.c_calc_bf(bone_name, inf_end_fno, is_key=False, is_read=False, is_reset_interpolation=False)
 
-                # 結合できた場合、補間曲線をnextに設定
+                # 結合できた場合、보간 곡선をnextに設定
                 if is_rot and len(joined_rot_bzs) > 0:
-                    logger.debug_info("☆%s: f: %s(%s), キー:回転補間曲線成功: 1: %s, 2: %s", bone_name, inf_start_fno, inf_end_fno, joined_rot_bzs[1].to_log(), joined_rot_bzs[2].to_log())
+                    logger.debug_info("☆%s: f: %s(%s), 키:회전 보간 곡선 성공: 1: %s, 2: %s", bone_name, inf_start_fno, inf_end_fno, joined_rot_bzs[1].to_log(), joined_rot_bzs[2].to_log())
                     self.reset_interpolation_parts(bone_name, next_bf, joined_rot_bzs, MBezierUtils.R_x1_idxs, MBezierUtils.R_y1_idxs, MBezierUtils.R_x2_idxs, MBezierUtils.R_y2_idxs)
-                
+
                 if is_mov and len(joined_mx_bzs) > 0 and len(joined_my_bzs) > 0 and len(joined_mz_bzs) > 0:
-                    logger.debug_info("☆%s: f: %s(%s), キー:移動X補間曲線成功: 1: %s, 2: %s", bone_name, inf_start_fno, inf_end_fno, joined_mx_bzs[1].to_log(), joined_mx_bzs[2].to_log())
-                    logger.debug_info("☆%s: f: %s(%s), キー:移動Y補間曲線成功: 1: %s, 2: %s", bone_name, inf_start_fno, inf_end_fno, joined_my_bzs[1].to_log(), joined_my_bzs[2].to_log())
-                    logger.debug_info("☆%s: f: %s(%s), キー:移動Z補間曲線成功: 1: %s, 2: %s", bone_name, inf_start_fno, inf_end_fno, joined_mz_bzs[1].to_log(), joined_mz_bzs[2].to_log())
+                    logger.debug_info("☆%s: f: %s(%s), 키:이동 X 보간 곡선 성공: 1: %s, 2: %s", bone_name, inf_start_fno, inf_end_fno, joined_mx_bzs[1].to_log(), joined_mx_bzs[2].to_log())
+                    logger.debug_info("☆%s: f: %s(%s), 키:이동 Y 보간 곡선 성공: 1: %s, 2: %s", bone_name, inf_start_fno, inf_end_fno, joined_my_bzs[1].to_log(), joined_my_bzs[2].to_log())
+                    logger.debug_info("☆%s: f: %s(%s), 키:이동 Z 보간 곡선 성공: 1: %s, 2: %s", bone_name, inf_start_fno, inf_end_fno, joined_mz_bzs[1].to_log(), joined_mz_bzs[2].to_log())
                     self.reset_interpolation_parts(bone_name, next_bf, joined_mx_bzs, MBezierUtils.MX_x1_idxs, MBezierUtils.MX_y1_idxs, MBezierUtils.MX_x2_idxs, MBezierUtils.MX_y2_idxs)
                     self.reset_interpolation_parts(bone_name, next_bf, joined_my_bzs, MBezierUtils.MY_x1_idxs, MBezierUtils.MY_y1_idxs, MBezierUtils.MY_x2_idxs, MBezierUtils.MY_y2_idxs)
                     self.reset_interpolation_parts(bone_name, next_bf, joined_mz_bzs, MBezierUtils.MZ_x1_idxs, MBezierUtils.MZ_y1_idxs, MBezierUtils.MZ_x2_idxs, MBezierUtils.MZ_y2_idxs)
 
-                # 変曲点で登録
+                # 変曲点で등록
                 if bone_name in self.bones and inf_end_fno in self.bones[bone_name]:
                     self.bones[bone_name][inf_end_fno].key = True
                     self.bones[bone_name][inf_end_fno].interpolation = next_bf.interpolation
-                    logger.debug_info("◇登録 %s: f: %s, next_bf(%s) rot:%s", bone_name, inf_end_fno, next_bf.fno, next_bf.rotation.toEulerAngles4MMD().to_log())
+                    logger.debug_info("◇등록 %s: f: %s, next_bf(%s) rot:%s", bone_name, inf_end_fno, next_bf.fno, next_bf.rotation.toEulerAngles4MMD().to_log())
                 else:
                     self.c_regist_bf(next_bf, bone_name, inf_end_fno, copy_interpolation=True, key=True)
-                    logger.debug_info("☆登録 %s: f: %s, next_bf(%s) rot:%s", bone_name, inf_end_fno, next_bf.fno, next_bf.rotation.toEulerAngles4MMD().to_log())
-                
-                logger.debug_info("☆%s: f: %s, キーフレ削除: %s-%s", bone_name, inf_end_fno, inf_start_fno + 1, inf_end_fno - 1)
+                    logger.debug_info("☆등록 %s: f: %s, next_bf(%s) rot:%s", bone_name, inf_end_fno, next_bf.fno, next_bf.rotation.toEulerAngles4MMD().to_log())
+
+                logger.debug_info("☆%s: f: %s, 키 프레임 삭제: %s-%s", bone_name, inf_end_fno, inf_start_fno + 1, inf_end_fno - 1)
 
                 for f in range(inf_start_fno + 1, inf_end_fno):
-                    # 結合できた場合、区間内を削除
+                    # 結合できた場合、区間内を삭제
                     if f in self.bones[bone_name]:
                         # self.bones[bone_name][f].key = False
                         del self.bones[bone_name][f]
-                
-                # 成功記録
+
+                # 성공記録
                 is_prev_success = True
                 # 前回結合最終点を保持
                 prev_inf_end_fno = inf_end_fno
-                # 次のブロックに移動する
+                # 次のブロックに이동する
                 iidx += 1
 
                 if is_force:
-                    # 細分化で成功した場合はそのまま返す
+                    # 細分化で성공した場合はそのまま返す
                     return [inf_start_fno, inf_end_fno]
             else:
                 # 結合できなかった場合、開始を現在の変曲点に移す
-                logger.debug_info("★%s: f: %s(%s), キー:補間曲線失敗: rot_inflection: %s, mx_inflection: %s, my_inflection: %s, mz_inflection: %s", \
+                logger.debug_info("★%s: f: %s(%s), 키:보간 곡선 실패: rot_inflection: %s, mx_inflection: %s, my_inflection: %s, mz_inflection: %s", \
                                 bone_name, inf_start_fno, inf_end_fno, rot_inflection, mx_inflection, my_inflection, mz_inflection)
-               
+
                 if is_sub_remove and not is_prev_success:
-                    # 最終処理で一度も成功していない場合、前後に分けて不要キー区分削除処理実施
+                    # 最終処理で一度も성공していない場合、前後に分けて불필요키구분삭제処理実施
                     separate_fno = inf_start_fno + int((inf_end_fno - inf_start_fno) / 2)
                     activate_fnos = None
 
                     if inf_start_fno < separate_fno - 1:
-                        logger.debug_info(f"【不要キー削除(区分削除:前) - {bone_name}:{inf_start_fno}-{separate_fno}】")
-                        activate_fnos = self.c_remove_unnecessary_bf(data_set_no, bone_name, is_rot, is_mov, offset, rot_diff_limit, mov_diff_limit, inf_start_fno, separate_fno, False, True, is_sub_remove, 
+                        logger.debug_info(f"【불필요 키 삭제(구분 삭제:전) - {bone_name}:{inf_start_fno}-{separate_fno}】")
+                        activate_fnos = self.c_remove_unnecessary_bf(data_set_no, bone_name, is_rot, is_mov, offset, rot_diff_limit, mov_diff_limit, inf_start_fno, separate_fno, False, True, is_sub_remove,
                                                                      r_dict, mx_dict, my_dict, mz_dict, [inf_start_fno, separate_fno])
                         # 前回結合最終点を保持（結合した後ろのを保持）
                         inf_start_fno = separate_fno
                     else:
-                        logger.debug_info(f"【不要キー削除(区分削除:後) - {bone_name}:{separate_fno}-{inf_end_fno}】")
-                        activate_fnos = self.c_remove_unnecessary_bf(data_set_no, bone_name, is_rot, is_mov, offset, rot_diff_limit, mov_diff_limit, separate_fno, inf_end_fno, False, True, is_sub_remove, 
+                        logger.debug_info(f"【불필요 키 삭제(구분 삭제:후) - {bone_name}:{separate_fno}-{inf_end_fno}】")
+                        activate_fnos = self.c_remove_unnecessary_bf(data_set_no, bone_name, is_rot, is_mov, offset, rot_diff_limit, mov_diff_limit, separate_fno, inf_end_fno, False, True, is_sub_remove,
                                                                      r_dict, mx_dict, my_dict, mz_dict, [separate_fno, inf_end_fno])
                         # 前回結合最終点を保持（結合した後ろのを保持）
                         inf_start_fno = inf_end_fno
@@ -730,9 +730,9 @@ cdef class VmdMotion:
                     # 結合した最後から次へ進める
                     inf_start_fno = prev_inf_end_fno
 
-                # 失敗記録
+                # 실패記録
                 is_prev_success = False
-                # 次のブロックには移動しない（今回の結合場所までの範囲）
+                # 次のブロックには이동しない（今回の結合場所までの範囲）
                 prev_inf_end_fno = inf_end_fno
 
                 if is_force:
@@ -740,24 +740,24 @@ cdef class VmdMotion:
 
             if inf_end_fno // 500 > prev_sep_fno and is_show_log:
                 if data_set_no == 0:
-                    logger.count(f"【不要キー削除 - {bone_name}】", inf_end_fno, list(fnos))
+                    logger.count(f"【불필요 키 삭제 - {bone_name}】", inf_end_fno, list(fnos))
                 else:
-                    logger.count(f"【No.{data_set_no} - 不要キー削除 - {bone_name}】", inf_end_fno, list(fnos))
+                    logger.count(f"【No.{data_set_no} - 불필요 키 삭제 - {bone_name}】", inf_end_fno, list(fnos))
 
                 prev_sep_fno = inf_end_fno // 500
 
-        # キーフレを取得する
+        # 키 프레임を取得する
         if r_start_fno < 0 and r_end_fno < 0:
             # 範囲指定がない場合、全範囲
             activate_fnos = self.get_bone_fnos(bone_name, is_key=True)
-            logger.debug("【不要キー削除 - %s】 active(all): %s", bone_name, activate_fnos)
+            logger.debug("【불필요 키 삭제 - %s】 active(all): %s", bone_name, activate_fnos)
         else:
             # 範囲指定がある場合はその範囲内だけ
             activate_fnos = self.get_bone_fnos(bone_name, start_fno=r_start_fno, end_fno=r_end_fno, is_key=True)
-            logger.debug("【不要キー削除 - %s】 active(range): %s", bone_name, activate_fnos)
-        
+            logger.debug("【불필요 키 삭제 - %s】 active(range): %s", bone_name, activate_fnos)
+
         return activate_fnos
-    
+
     cdef tuple c_get_infections(self, int data_set_no, str bone_name, bint is_rot, bint is_mov, np.ndarray fnos, list active_fnos):
         cdef dict r_dict = {}
         cdef dict mx_dict = {}
@@ -780,7 +780,7 @@ cdef class VmdMotion:
                 mx_dict[fno] = bf.position.x()
                 my_dict[fno] = bf.position.y()
                 mz_dict[fno] = bf.position.z()
-            
+
             if is_rot:
                 r_dict[fno] = bf.rotation
 
@@ -811,7 +811,7 @@ cdef class VmdMotion:
             rf_prime = np.gradient(list(rot_diff_value_dict.values()))                                                      # 差分近似
             r_indices = np.where(np.diff(np.sign(rf_prime)))[0]                                                             # 変曲点を求める。
             r_diff_indices = np.where(np.abs(np.diff(np.array(list(rot_diff_value_dict.values()))[r_indices])) > 0.001)     # 変曲点同士の差異が閾値以上
-            r_infections = (fnos[1:][r_indices])[r_diff_indices]                                                            # 変曲点のキーフレを再取得する
+            r_infections = (fnos[1:][r_indices])[r_diff_indices]                                                            # 変曲点の키 프레임を再取得する
 
             logger.debug_info("☆%s: start: %s, end: %s, rf_prime: %s", bone_name, fnos[0], fnos[-1], list(rf_prime))
             logger.debug_info("☆%s: start: %s, end: %s, sign: %s", bone_name, fnos[0], fnos[-1], list(np.sign(rf_prime)))
@@ -857,7 +857,7 @@ cdef class VmdMotion:
             logger.debug_info("☆%s: start: %s, end: %s, index_diff: %s", bone_name, fnos[0], fnos[-1], list(np.diff(np.array(list(mz_diff_value_dict.values()))[mz_indices])))
             logger.debug_info("☆%s: start: %s, end: %s, mz_diff_indices: %s", bone_name, fnos[0], fnos[-1], list((fnos[mz_indices])[mz_diff_indices]))
 
-        # 各値の変曲点の和集合かつ有効なキーフレのみ対象とする
+        # 各値の変曲点の和集合かつ有効な키 프레임のみ対象とする
         infections = sorted(set(set([active_fnos[0], active_fnos[-1]]) | set(r_infections) | set(mx_infections) | set(my_infections) | set(mz_infections) | set([active_fnos[-1]])) & set(active_fnos))
         logger.debug_info("☆%s: start: %s, end: %s, active_fnos: %s", bone_name, fnos[0], fnos[-1], active_fnos)
         logger.debug_info("☆%s: start: %s, end: %s, r_infections: %s", bone_name, fnos[0], fnos[-1], list(r_infections))
@@ -885,7 +885,7 @@ cdef class VmdMotion:
     #     # 前後のフレームで平均を取る
     #     if len(data) > delimiter:
     #         move_avg = np.convolve(data, np.ones(delimiter)/delimiter, 'valid')
-    #         # 移動平均でデータ数が減るため、前と後ろに同じ値を繰り返しで補填する
+    #         # 이동平均でデータ数が減るため、前と後ろに同じ値を繰り返しで補填する
     #         fore_n = int((delimiter - 1)/2)
     #         back_n = delimiter - 1 - fore_n
     #         smooth_vs = np.hstack((np.tile([move_avg[0]], fore_n), move_avg, np.tile([move_avg[-1]], back_n)))
@@ -901,24 +901,24 @@ cdef class VmdMotion:
     #     return smooth_dict
     #     # return values
 
-    # 補間曲線分割ありで登録
+    # 보간 곡선分割ありで등록
     def regist_bf(self, bf: VmdBoneFrame, bone_name: str, fno: int, copy_interpolation=False, key=True):
         self.c_regist_bf(bf, bone_name, fno, copy_interpolation, key)
 
-    # 補間曲線分割ありで登録
+    # 보간 곡선分割ありで등록
     cdef c_regist_bf(self, VmdBoneFrame bf, str bone_name, int fno, bint copy_interpolation, bint key):
-        # 登録対象の場合のみ、補間曲線リセットで登録する
+        # 등록対象の場合のみ、보간 곡선リセットで등록する
         cdef VmdBoneFrame regist_bf = self.c_calc_bf(bone_name, fno, is_key=False, is_read=False, is_reset_interpolation=True)
         regist_bf.position = bf.position.copy()
         regist_bf.rotation = bf.rotation.copy()
         regist_bf.org_rotation = bf.org_rotation.copy()
         if copy_interpolation:
             regist_bf.interpolation = cPickle.loads(cPickle.dumps(bf.interpolation, -1))
-            
-        # キーを登録
+
+        # 키を등록
         regist_bf.key = key
         self.bones[bone_name][fno] = regist_bf
-        # 補間曲線を設定（有効なキーのみ）
+        # 보간 곡선を設定（有効な키のみ）
         cdef int prev_fno, next_fno
         cdef VmdBoneFrame prev_bf, next_bf
         if key:
@@ -928,7 +928,7 @@ cdef class VmdMotion:
             next_bf = self.c_calc_bf(bone_name, next_fno, is_key=False, is_read=False, is_reset_interpolation=False)
             self.split_bf_by_fno(bone_name, prev_bf, next_bf, fno)
 
-    # 補間曲線を考慮した指定フレーム番号の位置
+    # 보간 곡선を考慮した指定フレーム番号の位置
     # https://www55.atwiki.jp/kumiho_k/pages/15.html
     # https://harigane.at.webry.info/201103/article_1.html
     def calc_bf(self, bone_name: str, fno: int, is_key=False, is_read=False, is_reset_interpolation=False):
@@ -943,17 +943,17 @@ cdef class VmdMotion:
             self.bones[bone_name] = {fno: fill_bf}
             fill_bf.set_name(bone_name)
             return fill_bf
-        
+
         # 条件に合致するフレーム番号を探す
-        # is_key: 登録対象のキーを探す
-        # is_read: データ読み込み時のキーを探す
+        # is_key: 등록対象の키を探す
+        # is_read: データ読み込み時の키を探す
         if fno in self.bones[bone_name] and (not is_key or (is_key and self.bones[bone_name][fno].key)) and (not is_read or (is_read and self.bones[bone_name][fno].read)):
-            # 合致するキーが見つかった場合、それを返す
+            # 合致する키が見つかった場合、それを返す
             return self.bones[bone_name][fno]
         else:
-            # 合致するキーが見つからなかった場合
+            # 合致する키が見つからなかった場合
             if is_key or is_read:
-                # 既存キーのみ探している場合はNone
+                # 既存키のみ探している場合はNone
                 return None
 
         # 番号より前のフレーム番号
@@ -972,7 +972,7 @@ cdef class VmdMotion:
             fill_bf.key = False
             fill_bf.read = False
             return fill_bf
-        
+
         if len(before_fnos) == 0:
             # 番号より後があって、前がない場合、後のをコピーして返す
             fill_bf = self.bones[bone_name][after_fnos[0]].copy()
@@ -988,7 +988,7 @@ cdef class VmdMotion:
         fill_bf.name = prev_bf.name
         fill_bf.bname = prev_bf.bname
 
-        # 補間曲線を元に間を埋める
+        # 보간 곡선を元に間を埋める
         # rfunc = profile(self.calc_bf_rot)
         # fill_bf.rotation = rfunc(prev_bf, fill_bf, next_bf)
         # pfunc = profile(self.calc_bf_pos)
@@ -997,24 +997,24 @@ cdef class VmdMotion:
         fill_bf.position = self.calc_bf_pos(prev_bf, fill_bf, next_bf)
 
         if is_reset_interpolation:
-            # 補間曲線再設定の場合、範囲外でも構わないので補間曲線を設定する
+            # 보간 곡선再設定の場合、範囲外でも構わないので보간 곡선を設定する
 
-            # 回転の分割
+            # 회전の分割
             r_x, r_y, r_t, r_bresult, r_aresult, r_before_bz, r_after_bz \
                 = MBezierUtils.split_bezier_mmd(next_bf.interpolation[MBezierUtils.R_x1_idxs[3]], next_bf.interpolation[MBezierUtils.R_y1_idxs[3]], \
                                                 next_bf.interpolation[MBezierUtils.R_x2_idxs[3]], next_bf.interpolation[MBezierUtils.R_y2_idxs[3]], \
                                                 prev_bf.fno, fill_bf.fno, next_bf.fno)
-            # 移動Xの分割
+            # 이동Xの分割
             x_x, x_y, x_t, x_bresult, x_aresult, x_before_bz, x_aftex_bz \
                 = MBezierUtils.split_bezier_mmd(next_bf.interpolation[MBezierUtils.MX_x1_idxs[3]], next_bf.interpolation[MBezierUtils.MX_y1_idxs[3]], \
                                                 next_bf.interpolation[MBezierUtils.MX_x2_idxs[3]], next_bf.interpolation[MBezierUtils.MX_y2_idxs[3]], \
                                                 prev_bf.fno, fill_bf.fno, next_bf.fno)
-            # 移動Yの分割
+            # 이동Yの分割
             y_x, y_y, y_t, y_bresult, y_aresult, y_before_bz, y_aftey_bz \
                 = MBezierUtils.split_bezier_mmd(next_bf.interpolation[MBezierUtils.MY_x1_idxs[3]], next_bf.interpolation[MBezierUtils.MY_y1_idxs[3]], \
                                                 next_bf.interpolation[MBezierUtils.MY_x2_idxs[3]], next_bf.interpolation[MBezierUtils.MY_y2_idxs[3]], \
                                                 prev_bf.fno, fill_bf.fno, next_bf.fno)
-            # 移動Zの分割
+            # 이동Zの分割
             z_x, z_y, z_t, z_bresult, z_aresult, z_before_bz, z_aftez_bz \
                 = MBezierUtils.split_bezier_mmd(next_bf.interpolation[MBezierUtils.MZ_x1_idxs[3]], next_bf.interpolation[MBezierUtils.MZ_y1_idxs[3]], \
                                                 next_bf.interpolation[MBezierUtils.MZ_x2_idxs[3]], next_bf.interpolation[MBezierUtils.MZ_y2_idxs[3]], \
@@ -1032,12 +1032,12 @@ cdef class VmdMotion:
 
         return fill_bf
 
-    # 補間曲線を元に、回転ボーンの値を求める
+    # 보간 곡선を元に、회전ボーンの値を求める
     cdef MQuaternion calc_bf_rot(self, VmdBoneFrame prev_bf, VmdBoneFrame fill_bf, VmdBoneFrame next_bf):
         cdef double rx, ry, rt
 
         if prev_bf.rotation != next_bf.rotation:
-            # 回転補間曲線
+            # 회전보간 곡선
             rx, ry, rt = MBezierUtils.evaluate(next_bf.interpolation[MBezierUtils.R_x1_idxs[3]], next_bf.interpolation[MBezierUtils.R_y1_idxs[3]], \
                                                next_bf.interpolation[MBezierUtils.R_x2_idxs[3]], next_bf.interpolation[MBezierUtils.R_y2_idxs[3]], \
                                                prev_bf.fno, fill_bf.fno, next_bf.fno)
@@ -1045,23 +1045,23 @@ cdef class VmdMotion:
 
         return prev_bf.rotation.copy()
 
-    # 補間曲線を元に移動ボーンの値を求める
+    # 보간 곡선を元に이동ボーンの値を求める
     cdef MVector3D calc_bf_pos(self, VmdBoneFrame prev_bf, VmdBoneFrame fill_bf, VmdBoneFrame next_bf):
         cdef double xx, xy, xt, yx, yy, yt, zx, zy, zt
         cdef MVector3D fill_pos
 
-        # 補間曲線を元に間を埋める
+        # 보간 곡선を元に間を埋める
         if prev_bf.position != next_bf.position:
             # http://rantyen.blog.fc2.com/blog-entry-65.html
-            # X移動補間曲線
+            # X이동보간 곡선
             xx, xy, xt = MBezierUtils.evaluate(next_bf.interpolation[MBezierUtils.MX_x1_idxs[3]], next_bf.interpolation[MBezierUtils.MX_y1_idxs[3]], \
                                                next_bf.interpolation[MBezierUtils.MX_x2_idxs[3]], next_bf.interpolation[MBezierUtils.MX_y2_idxs[3]], \
                                                prev_bf.fno, fill_bf.fno, next_bf.fno)
-            # Y移動補間曲線
+            # Y이동보간 곡선
             yx, yy, yt = MBezierUtils.evaluate(next_bf.interpolation[MBezierUtils.MY_x1_idxs[3]], next_bf.interpolation[MBezierUtils.MY_y1_idxs[3]], \
                                                next_bf.interpolation[MBezierUtils.MY_x2_idxs[3]], next_bf.interpolation[MBezierUtils.MY_y2_idxs[3]], \
                                                prev_bf.fno, fill_bf.fno, next_bf.fno)
-            # Z移動補間曲線
+            # Z이동보간 곡선
             zx, zy, zt = MBezierUtils.evaluate(next_bf.interpolation[MBezierUtils.MZ_x1_idxs[3]], next_bf.interpolation[MBezierUtils.MZ_y1_idxs[3]], \
                                                next_bf.interpolation[MBezierUtils.MZ_x2_idxs[3]], next_bf.interpolation[MBezierUtils.MZ_y2_idxs[3]], \
                                                prev_bf.fno, fill_bf.fno, next_bf.fno)
@@ -1070,18 +1070,18 @@ cdef class VmdMotion:
             fill_pos.setX(prev_bf.position.x() + ((next_bf.position.x() - prev_bf.position.x()) * xy))
             fill_pos.setY(prev_bf.position.y() + ((next_bf.position.y() - prev_bf.position.y()) * yy))
             fill_pos.setZ(prev_bf.position.z() + ((next_bf.position.z() - prev_bf.position.z()) * zy))
-            
+
             return fill_pos
-        
+
         return prev_bf.position.copy()
-    
-    # キーフレを指定されたフレーム番号の前後で分割する
+
+    # 키 프레임を指定されたフレーム番号の前後で分割する
     cdef bint split_bf_by_fno(self, str target_bone_name, VmdBoneFrame prev_bf, VmdBoneFrame next_bf, int fill_fno):
         if not (prev_bf.fno < fill_fno < next_bf.fno):
             # 間の分割が出来ない場合、終了
             return False
 
-        # 補間曲線もともに分割する
+        # 보간 곡선もともに分割する
         cdef VmdBoneFrame fill_bf = self.c_calc_bf(target_bone_name, fill_fno, is_key=False, is_read=False, is_reset_interpolation=True)
         fill_bf.key = True
         self.bones[target_bone_name][fill_fno] = fill_bf
@@ -1095,22 +1095,22 @@ cdef class VmdMotion:
 
         return fill_result
 
-    # キーフレを移動量の中心で分割する
+    # 키 프레임を이동量の中心で分割する
     cdef bint split_bf(self, str target_bone_name, VmdBoneFrame prev_bf, VmdBoneFrame next_bf):
         if prev_bf.fno == next_bf.fno:
             # 間の分割が出来ない場合、終了
             return True
 
-        # 回転中点fno
+        # 회전中点fno
         cdef int r_fill_fno = self.get_split_fill_fno(target_bone_name, prev_bf, next_bf, \
                                                       MBezierUtils.R_x1_idxs, MBezierUtils.R_y1_idxs, MBezierUtils.R_x2_idxs, MBezierUtils.R_y2_idxs)
-        # 移動X中点fno
+        # 이동X中点fno
         cdef int x_fill_fno = self.get_split_fill_fno(target_bone_name, prev_bf, next_bf, \
                                                       MBezierUtils.MX_x1_idxs, MBezierUtils.MX_y1_idxs, MBezierUtils.MX_x2_idxs, MBezierUtils.MX_y2_idxs)
-        # 移動Y中点fno
+        # 이동Y中点fno
         cdef int y_fill_fno = self.get_split_fill_fno(target_bone_name, prev_bf, next_bf, \
                                                       MBezierUtils.MY_x1_idxs, MBezierUtils.MY_y1_idxs, MBezierUtils.MY_x2_idxs, MBezierUtils.MY_y2_idxs)
-        # 移動Z中点fno
+        # 이동Z中点fno
         cdef int z_fill_fno = self.get_split_fill_fno(target_bone_name, prev_bf, next_bf, \
                                                       MBezierUtils.MZ_x1_idxs, MBezierUtils.MZ_y1_idxs, MBezierUtils.MZ_x2_idxs, MBezierUtils.MZ_y2_idxs)
 
@@ -1128,11 +1128,11 @@ cdef class VmdMotion:
         if len(fnos) > 0:
             # 現在処理対象以外にfnoがある場合、その最小地点で前後に分割
             fill_result = self.split_bf_by_fno(target_bone_name, prev_bf, next_bf, fnos[0]) and fill_result
-        
+
         return fill_result
-    
-    # キーフレを指定bf間の中間で区切れるフレーム番号を取得する
-    # 分割が不要（範囲内に収まってる）場合、-1で対象外
+
+    # 키 프레임を指定bf間の中間で区切れるフレーム番号を取得する
+    # 分割が불필요（範囲内に収まってる）場合、-1で対象外
     cdef int get_split_fill_fno(self, str target_bone_name, VmdBoneFrame prev_bf, VmdBoneFrame next_bf, \
                                  list x1_idxs, list y1_idxs, list x2_idxs, list y2_idxs):
         cdef int next_x1v = next_bf.interpolation[x1_idxs[3]]
@@ -1147,21 +1147,21 @@ cdef class VmdMotion:
 
             if prev_bf.fno < new_fill_fno < next_bf.fno:
                 return new_fill_fno
-        
+
         # 範囲内でない場合
         return -1
 
-    # 補間曲線の再設定処理
+    # 보간 곡선の再設定処理
     cdef reset_interpolation(self, str target_bone_name, VmdBoneFrame prev_bf, VmdBoneFrame now_bf, VmdBoneFrame next_bf, \
                               list before_bz, list after_bz, list x1_idxs, list y1_idxs, list x2_idxs, list y2_idxs):
-        
-        # 今回キーに設定
+
+        # 今回키に設定
         self.reset_interpolation_parts(target_bone_name, now_bf, before_bz, x1_idxs, y1_idxs, x2_idxs, y2_idxs)
 
-        # nextキーに設定
+        # next키に設定
         self.reset_interpolation_parts(target_bone_name, next_bf, after_bz, x1_idxs, y1_idxs, x2_idxs, y2_idxs)
-    
-    # 補間曲線のコピー
+
+    # 보간 곡선のコピー
     cpdef copy_interpolation(self, VmdBoneFrame org_bf, VmdBoneFrame rep_bf, str bz_type):
         cdef list bz_x1_idxs, bz_y1_idxs, bz_x2_idxs, bz_y2_idxs
         cdef list org_interpolation = cPickle.loads(cPickle.dumps(org_bf.interpolation, -1))
@@ -1178,27 +1178,27 @@ cdef class VmdMotion:
         rep_bf.interpolation[bz_y2_idxs[0]] = rep_bf.interpolation[bz_y2_idxs[2]] = rep_bf.interpolation[bz_y2_idxs[2]] = rep_bf.interpolation[bz_y2_idxs[3]] \
             = org_interpolation[bz_y2_idxs[3]]
 
-    # 補間曲線の再設定部品
+    # 보간 곡선の再設定部品
     cdef reset_interpolation_parts(self, str target_bone_name, VmdBoneFrame bf, list bzs, list x1_idxs, list y1_idxs, list x2_idxs, list y2_idxs):
-        # キーの始点は、B
+        # 키の始点は、B
         bf.interpolation[x1_idxs[0]] = bf.interpolation[x1_idxs[1]] = bf.interpolation[x1_idxs[2]] = bf.interpolation[x1_idxs[3]] = int(bzs[1].x())
         bf.interpolation[y1_idxs[0]] = bf.interpolation[y1_idxs[1]] = bf.interpolation[y1_idxs[2]] = bf.interpolation[y1_idxs[3]] = int(bzs[1].y())
 
-        # キーの終点は、C
+        # 키の終点は、C
         bf.interpolation[x2_idxs[0]] = bf.interpolation[x2_idxs[1]] = bf.interpolation[x2_idxs[2]] = bf.interpolation[x2_idxs[3]] = int(bzs[2].x())
         bf.interpolation[y2_idxs[0]] = bf.interpolation[y2_idxs[1]] = bf.interpolation[y2_idxs[2]] = bf.interpolation[y2_idxs[3]] = int(bzs[2].y())
-    
+
     def regist_full_mf(self, data_set_no: int, morph_name_list: list, offset=1, is_key=True):
         self.c_regist_full_mf(data_set_no, morph_name_list, offset, is_key)
 
     cdef c_regist_full_mf(self, int data_set_no, list morph_name_list, int offset, bint is_key):
-        # 指定された全部のモーフのキーフレ取得
+        # 指定された全部のモーフの키 프레임取得
         cdef list fnos = self.get_morph_fnos(*morph_name_list)
 
         if len(fnos) == 0:
             return
 
-        # オフセット単位でキーフレ計算
+        # オフセット単位で키 프레임計算
         fnos.extend(x for x in range(fnos[-1])[::offset])
         # 重複を除いて再計算
         fnos = sorted(list(set(fnos)))
@@ -1207,7 +1207,7 @@ cdef class VmdMotion:
         cdef int fno, prev_sep_fno
         cdef VmdMorphFrame mf
 
-        # 指定モーフ名でキーフレ登録
+        # 指定モーフ名で키 프레임등록
         for morph_name in morph_name_list:
             prev_sep_fno = 0
 
@@ -1220,15 +1220,15 @@ cdef class VmdMotion:
                 self.c_regist_mf(mf.copy(), morph_name, fno)
 
                 if not is_key and not mf.read:
-                    # 無効化のままの場合、キーをOFFにしておく
+                    # 無効化のままの場合、키をOFFにしておく
                     self.morphs[morph_name][fno].key = False
 
                 if fno // 500 > prev_sep_fno and fnos[-1] > 0:
                     if data_set_no == 0:
-                        logger.info("-- %sフレーム目:終了(%s％)【全打ち - %s】", fno, round((fno / fnos[-1]) * 100, 3), morph_name)
+                        logger.info("-- %s프레임째: 종료(%s％)【전체 맞음 - %s】", fno, round((fno / fnos[-1]) * 100, 3), morph_name)
                         prev_sep_fno = fno // 500
                     elif data_set_no > 0:
-                        logger.info("-- %sフレーム目:終了(%s％)【No.%s - 全打ち - %s】", fno, round((fno / fnos[-1]) * 100, 3), data_set_no, morph_name)
+                        logger.info("-- %s프레임째: 종료(%s％)【No.%s - 전체 맞음 - %s】", fno, round((fno / fnos[-1]) * 100, 3), data_set_no, morph_name)
                         prev_sep_fno = fno // 500
 
 
@@ -1236,32 +1236,32 @@ cdef class VmdMotion:
     def get_morph_fnos(self, *morph_names, **kwargs):
         if not self.morphs:
             return []
-        
-        # is_key: 登録対象のキーを探す
-        # is_read: データ読み込み時のキーを探す
+
+        # is_key: 등록対象の키を探す
+        # is_read: データ読み込み時の키を探す
         is_key = True if "is_key" in kwargs and kwargs["is_key"] else False
         is_read = True if "is_read" in kwargs and kwargs["is_read"] else False
         start_fno = kwargs["start_fno"] if "start_fno" in kwargs and kwargs["start_fno"] else 0
         end_fno = kwargs["end_fno"] if "end_fno" in kwargs and kwargs["end_fno"] else 9999999999
-        
+
         # 条件に合致するフレーム番号を探す
         keys = []
         for morph_name in morph_names:
             if morph_name in self.morphs:
                 keys.extend([x for x in self.morphs[morph_name].keys() if self.morphs[morph_name][x].fno >= start_fno and self.morphs[morph_name][x].fno <= end_fno and \
                             (not is_key or (is_key and self.morphs[morph_name][x].key)) and (not is_read or (is_read and self.morphs[morph_name][x].read))])
-        
+
         # 重複を除いた昇順フレーム番号リストを返す
         return sorted(list(set(keys)))
 
-    # モーフ登録
+    # モーフ등록
     def regist_mf(self, mf: VmdMorphFrame, morph_name: str, fno: int):
         if isnan(mf.ratio) or isinf(mf.ratio):
             logger.debug("** regist_mf: (%s)%s", mf.fno, mf.ratio)
 
         self.c_regist_mf(mf, morph_name, fno)
 
-    # モーフ登録
+    # モーフ등록
     cdef c_regist_mf(self, VmdMorphFrame mf, str morph_name, int fno):
         cdef VmdMorphFrame regist_mf = VmdMorphFrame(mf.fno)
         regist_mf.set_name(mf.name)
@@ -1273,7 +1273,7 @@ cdef class VmdMotion:
         if isnan(regist_mf.ratio) or isinf(regist_mf.ratio):
             logger.debug("*** c_regist_mf: (%s)%s", regist_mf.fno, regist_mf.ratio)
 
-        # キーを登録
+        # 키を등록
         regist_mf.key = True
         self.morphs[morph_name][fno] = regist_mf
 
@@ -1290,18 +1290,18 @@ cdef class VmdMotion:
             fill_mf.set_name(morph_name)
             self.morphs[morph_name] = {fno: fill_mf}
             return fill_mf
-        
+
         # 条件に合致するフレーム番号を探す
-        # is_key: 登録対象のキーを探す
-        # is_read: データ読み込み時のキーを探す
+        # is_key: 등록対象の키を探す
+        # is_read: データ読み込み時の키を探す
         if fno in self.morphs[morph_name] and (not is_key or (is_key and self.morphs[morph_name][fno].key)) and (not is_read or (is_read and self.morphs[morph_name][fno].read)):
-            # 合致するキーが見つかった場合、それを返す
+            # 合致する키が見つかった場合、それを返す
             logger.debug("** find: fill: (%s)%s", fill_mf.fno, self.morphs[morph_name][fno].ratio)
             return self.morphs[morph_name][fno]
         else:
-            # 合致するキーが見つからなかった場合
+            # 合致する키が見つからなかった場合
             if is_key or is_read:
-                # 既存キーのみ探している場合はNone
+                # 既存키のみ探している場合はNone
                 return None
 
         # 番号より前のフレーム番号
@@ -1321,7 +1321,7 @@ cdef class VmdMotion:
             fill_mf.read = False
             logger.debug("** not after: fill: (%s)%s", fill_mf.fno, fill_mf.ratio)
             return fill_mf
-        
+
         if len(before_fnos) == 0:
             # 番号より後があって、前がない場合、後のをコピーして返す
             fill_mf = self.morphs[morph_name][after_fnos[0]].copy()
@@ -1372,7 +1372,7 @@ cdef class VmdMotion:
             fnos = self.get_morph_fnos(morph_name)
             prev_sep_fno = 0
 
-            # キーフレを取得する
+            # 키 프레임を取得する
             if start_fno < 0 and end_fno < 0:
                 # 範囲指定がない場合、全範囲
                 fnos = self.get_morph_fnos(morph_name)
@@ -1386,10 +1386,10 @@ cdef class VmdMotion:
                 now_mf.ratio = rxfilter(now_mf.ratio, fno)
 
                 if is_show_log and data_set_no > 0 and fno // 2000 > prev_sep_fno and fnos[-1] > 0:
-                    logger.info("-- %sフレーム目:終了(%s％)【No.%s - フィルタリング - %s(%s)】", fno, round((fno / fnos[-1]) * 100, 3), data_set_no, morph_name, (n + 1))
+                    logger.info("-- %s프레임째: 종료(%s％)【No.%s - 필터링 - %s(%s)】", fno, round((fno / fnos[-1]) * 100, 3), data_set_no, morph_name, (n + 1))
                     prev_sep_fno = fno // 2000
 
-    # 無効なキーを物理削除する
+    # 無効な키を物理삭제する
     def remove_unkey_mf(self, data_set_no: int, morph_name: str):
         for fno in self.get_morph_fnos(morph_name):
             mf = self.c_calc_mf(morph_name, fno, is_key=False, is_read=False)
@@ -1397,20 +1397,20 @@ cdef class VmdMotion:
             if fno in self.morphs[morph_name] and not mf.key:
                 del self.morphs[morph_name][fno]
 
-    # 指定モーフの不要キーを削除する
+    # 指定モーフの불필요키を삭제する
     # 変曲点を求める
     # https://teratail.com/questions/162391
     def remove_unnecessary_mf(self, data_set_no: int, morph_name: str, offset=0, diff_limit=0.01, start_fno=-1, end_fno=-1, is_show_log=True, is_force=False):
         self.c_remove_unnecessary_mf(data_set_no, morph_name, offset, diff_limit, start_fno, end_fno, is_show_log, is_force)
 
-    # 指定モーフの不要キーを削除する
+    # 指定モーフの불필요키を삭제する
     # 変曲点を求める
     # https://teratail.com/questions/162391
     cdef c_remove_unnecessary_mf(self, int data_set_no, str morph_name, double offset, double diff_limit, int r_start_fno, int r_end_fno, bint is_show_log, bint is_force):
         cdef int prev_sep_fno = 0
         cdef list fnos
 
-        # キーフレを取得する
+        # 키 프레임を取得する
         if r_start_fno < 0 and r_end_fno < 0:
             # 範囲指定がない場合、全範囲
             fnos = self.get_morph_fnos(morph_name)
@@ -1418,10 +1418,10 @@ cdef class VmdMotion:
             # 範囲指定がある場合はその範囲内だけ
             fnos = self.get_morph_fnos(morph_name, start_fno=r_start_fno, end_fno=r_end_fno)
         logger.debug("reratioe_unnecessary_mf fnos: %s, %s", morph_name, fnos)
-        
+
         if len(fnos) <= 1:
             return
-        
+
         # cdef int f
         # cdef VmdMorphFrame mf = None
         # cdef VmdMorphFrame prev_mf = None
@@ -1434,22 +1434,22 @@ cdef class VmdMotion:
         #     ratio_vs.append(mf.ratio - prev_mf.ratio)
 
         #     prev_mf = mf
-        
-        # # 差異がないキーを除去する
+
+        # # 差異がない키を除去する
         # if sum(ratio_vs) < 0.0001:
         #     for f in range(1, fnos[-1] + 1):
         #         if f in self.morphs[morph_name]:
         #             del self.morphs[morph_name][f]
-        
+
         reduce_fnos = self.reduce_morph_frame(morph_name, fnos, fnos[0], fnos[-1], threshold=0.05)
         reduce_fnos.append(fnos[-1])
 
         for f in fnos:
             if f not in reduce_fnos and f in self.morphs[morph_name]:
-                # キーフレが残す対象でない場合、削除
+                # 키 프레임が残す対象でない場合、삭제
                 del self.morphs[morph_name][f]
-        
-    # キーフレームを間引く
+
+    # 키 프레임ームを間引く
     # オリジナル：https://github.com/errno-mmd/smoothvmd/blob/master/reducevmd.cc
     cdef reduce_morph_frame(self, str morph_name, list fnos, int head, int tail, float threshold):
         # ratioのエラー最大値
@@ -1498,54 +1498,54 @@ cdef class VmdMotion:
 
         return v1
 
-    # 有効なキーフレが入っているか
+    # 有効な키 프레임が入っているか
     cpdef bint is_active_bones(self, str bone_name):
         cdef VmdBoneFrame bf
         if bone_name not in self.bones:
             return False
-            
+
         for bf in self.bones[bone_name].values():
             if bf.position != MVector3D():
                 return True
             if bf.rotation != MQuaternion():
                 return True
-        
+
         return False
 
     # ボーンモーション：フレーム番号リスト
     def get_bone_fnos(self, *bone_names, **kwargs):
         if not self.bones:
             return []
-        
-        # is_key: 登録対象のキーを探す
-        # is_read: データ読み込み時のキーを探す
+
+        # is_key: 등록対象の키を探す
+        # is_read: データ読み込み時の키を探す
         is_key = True if "is_key" in kwargs and kwargs["is_key"] else False
         is_read = True if "is_read" in kwargs and kwargs["is_read"] else False
         start_fno = kwargs["start_fno"] if "start_fno" in kwargs and kwargs["start_fno"] else 0
         end_fno = kwargs["end_fno"] if "end_fno" in kwargs and kwargs["end_fno"] else 9999999999
-        
+
         # 条件に合致するフレーム番号を探す
         keys = []
         for bone_name in bone_names:
             if bone_name in self.bones:
                 keys.extend([x for x in self.bones[bone_name].keys() if self.bones[bone_name][x].fno >= start_fno and self.bones[bone_name][x].fno <= end_fno and \
                             (not is_key or (is_key and self.bones[bone_name][x].key)) and (not is_read or (is_read and self.bones[bone_name][x].read))])
-        
+
         # 重複を除いた昇順フレーム番号リストを返す
         return sorted(list(set(keys)))
-    
-    # 指定されたfnoの前後のキーを取得する
+
+    # 指定されたfnoの前後の키を取得する
     def get_bone_prev_next_fno(self, *bone_names, **kwargs):
         # 指定されたボーン名のfnos
         fnos = self.get_bone_fnos(*bone_names, **kwargs)
 
         fno = kwargs["fno"] if "fno" in kwargs else 0
 
-        # 指定より前のキーフレ
+        # 指定より前の키 프레임
         prev_fnos = [x for x in fnos if x < fno]
-        # 指定より後のキーフレ
+        # 指定より後の키 프레임
         next_fnos = [x for x in fnos if x > fno]
-        
+
         # 前のは取れなければ-1で強制的に前の
         prev_fno = -1 if len(prev_fnos) <= 0 else prev_fnos[-1]
         # 後のは取れなければ最終フレーム＋1
@@ -1557,9 +1557,9 @@ cdef class VmdMotion:
     def get_camera_fnos(self):
         if not self.cameras:
             return []
-        
+
         return sorted([fno for fno in self.cameras.keys()])
-        
+
     # ボーンモーション：一次元配列
     def get_bone_frames(self):
         total_bone_frames = []
@@ -1577,63 +1577,63 @@ cdef class VmdMotion:
             logger.test("%s, %s", bone_name, target_fnos[bone_name])
 
             if len(fnos) > 0:
-                # 各ボーンの最終キーだけ先に登録
+                # 各ボーンの最終키だけ先に등록
                 total_bone_frames.append(self.bones[bone_name][fnos[-1]])
-        
+
         for bone_name, fnos in target_fnos.items():
             if len(fnos) > 1:
-                # キーフレを最後の一つ手前まで登録
+                # 키 프레임を最後の一つ手前まで등록
                 for fno in fnos[:-1]:
                     if self.bones[bone_name][fno].key:
                         total_bone_frames.append(self.bones[bone_name][fno])
-        
+
         return total_bone_frames
-    
+
     # モーフモーション：一次元配列
     def get_morph_frames(self):
         total_morph_frames = []
 
         for morph_name, morph_frames in self.morphs.items():
             fnos = self.get_morph_fnos(morph_name)
-            
+
             if len(fnos) > 0:
-                # 各モーフの最終キーだけ先に登録
+                # 各モーフの最終키だけ先に등록
                 total_morph_frames.append(morph_frames[fnos[-1]])
-        
+
         for morph_name, morph_frames in self.morphs.items():
             fnos = self.get_morph_fnos(morph_name)
 
             if len(fnos) > 1:
-                # キーフレを最後の一つ手前まで登録
+                # 키 프레임を最後の一つ手前まで등록
                 for fno in fnos[:-1]:
                     total_morph_frames.append(morph_frames[fno])
-        
+
         return total_morph_frames
 
     # カメラモーション：一次元配列
     def get_camera_frames(self):
         total_camera_frames = []
 
-        # カメラキーフレを逆順に登録
+        # カメラ키 프레임を逆順に등록
         for fno in reversed(self.get_camera_fnos()):
             total_camera_frames.append(self.cameras[fno])
 
         return total_camera_frames
 
-    # ボーンキーフレを追加
+    # ボーン키 프레임を추가
     def append_bone_frame(self, frame: VmdBoneFrame):
         if frame.name not in self.bones:
-            # まだ該当ボーン名がない場合、追加
+            # まだ該当ボーン名がない場合、추가
             self.bones[frame.name] = {}
-        
+
         self.bones[frame.name][frame.fno] = frame
 
-    # モーフキーフレを追加
+    # モーフ키 프레임を추가
     def append_morph_frame(self, frame: VmdMorphFrame):
         if frame.name not in self.morphs:
-            # まだ該当モーフ名がない場合、追加
+            # まだ該当モーフ名がない場合、추가
             self.morphs[frame.name] = {}
-        
+
         self.morphs[frame.name][frame.fno] = frame
 
     # 指定fnoのみのモーションデータを生成する
@@ -1642,7 +1642,7 @@ cdef class VmdMotion:
 
         for bone_name in self.bones.keys():
             new_motion.bones[bone_name] = {fno: self.c_calc_bf(bone_name, fno, is_key=False, is_read=False, is_reset_interpolation=False).copy()}
-        
+
         return new_motion
 
     def copy(self):
@@ -1670,7 +1670,7 @@ cdef class VmdMotion:
         motion.shadows = cPickle.loads(cPickle.dumps(self.shadows, -1))
         motion.ik_cnt = cPickle.loads(cPickle.dumps(self.ik_cnt, -1))
         motion.showiks = cPickle.loads(cPickle.dumps(self.showiks, -1))
-        
+
         motion.digest = cPickle.loads(cPickle.dumps(self.digest, -1))
 
         return motion

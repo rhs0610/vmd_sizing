@@ -50,7 +50,7 @@ def read_history(mydir_path):
                         file_hitories[key] = []
                 # 最大件数は常に上書き
                 file_hitories["max"] = 50
-            
+
             # 一旦UTF-8で出力
             save_history(mydir_path, file_hitories)
 
@@ -68,13 +68,13 @@ def save_history(mydir_path, file_hitories):
         with open(os.path.join(mydir_path, 'history.json'), 'w', encoding="utf-8") as f:
             json.dump(file_hitories, f, ensure_ascii=False)
     except Exception as e:
-        logger.error("履歴ファイルの保存に失敗しました", e, decoration=MLogger.DECORATION_BOX)
+        logger.error("이력 파일 저장에 실패했습니다.", e, decoration=MLogger.DECORATION_BOX)
 
 
 # パス解決
 def get_mydir_path(exec_path):
     logger.test("sys.argv %s", sys.argv)
-    
+
     dir_path = Path(exec_path).parent if hasattr(sys, "frozen") else Path(__file__).parent
     logger.test("get_mydir_path: %s", get_mydir_path)
 
@@ -95,9 +95,9 @@ def get_dir_path(base_file_path, is_print=True):
         # ファイルパスをオブジェクトとして解決し、親を取得する
         return str(Path(file_path_list[0]).resolve().parents[0])
     except Exception as e:
-        logger.error("ファイルパスの解析に失敗しました。\nパスに使えない文字がないか確認してください。\nファイルパス: {0}\n\n{1}".format(base_file_path, e.with_traceback(sys.exc_info()[2])))
+        logger.error("파일 경로 해석에 실패했습니다.\n경로에 사용할 수 없는 문자가 없는지 확인해 주세요.\n파일 경로: {0}\n\n{1}".format(base_file_path, e.with_traceback(sys.exc_info()[2])))
         raise e
-    
+
 
 # モーフ置換組み合わせファイル
 def get_output_morph_path(base_file_path: str, org_pmx_path: str, rep_pmx_path: str):
@@ -178,14 +178,14 @@ def get_output_vmd_path(base_file_path: str, rep_pmx_path: str, detail_stance_fl
             open(new_output_vmd_path, 'w')
             os.remove(new_output_vmd_path)
         except Exception:
-            logger.warning("出力ファイルパスの生成に失敗しました。以下の原因が考えられます。\n" \
-                           + "・ファイルパスが255文字を超えている\n" \
-                           + "・ファイルパスに使えない文字列が含まれている（例) \\　/　:　*　?　\"　<　>　|）" \
-                           + "・出力ファイルパスの親フォルダに書き込み権限がない" \
-                           + "・出力ファイルパスに書き込み権限がない")
+            logger.warning("출력 파일 경로 생성에 실패했습니다.이하의 원인을 생각할 수 있습니다.\n" \
+                           + "·파일 경로가 255자를 넘었다\n"\
+                           + "·파일 경로에 사용할 수 없는 문자열이 포함되어 있다 (예) \/:*?\"<>|)"\
+                           + "·출력 파일 경로의 부모 폴더에 쓰기 권한이 없다"\
+                           + "·출력 파일 경로에 쓰기 권한이 없다")
 
         return new_output_vmd_path
-    
+
     return output_vmd_path
 
 
@@ -202,9 +202,9 @@ def is_auto_vmd_output_path(output_vmd_path: str, motion_vmd_dir_path: str, moti
 
     new_output_vmd_pattern = re.compile(r'^%s_%s%s%s$' % (escaped_motion_vmd_file_name, \
                                         escaped_rep_pmx_file_name, r"_?\w*_\d{8}_\d{6}", escaped_motion_vmd_ext))
-    
+
     logger.debug("new_output_vmd_pattern: %s", new_output_vmd_pattern)
-    
+
     # 自動生成ルールに則ったファイルパスである場合、合致あり
     return re.match(new_output_vmd_pattern, output_vmd_path) is not None
 
@@ -236,11 +236,11 @@ def get_output_camera_vmd_path(base_file_path: str, rep_pmx_path: str, output_ca
             open(new_output_camera_vmd_path, 'w')
             os.remove(new_output_camera_vmd_path)
         except Exception:
-            logger.warning("出力ファイルパスの生成に失敗しました。以下の原因が考えられます。\n" \
-                           + "・ファイルパスが255文字を超えている\n" \
-                           + "・ファイルパスに使えない文字列が含まれている（例) \\　/　:　*　?　\"　<　>　|）" \
-                           + "・出力ファイルパスの親フォルダに書き込み権限がない" \
-                           + "・出力ファイルパスに書き込み権限がない")
+            logger.warning("출력 파일 경로 생성에 실패했습니다.이하의 원인을 생각할 수 있습니다.\n"\
+                            + "·파일패스가 255자를 넘었다\n"\
+                            + "·파일 경로에 사용할 수 없는 문자열이 포함되어 있음 (예) \/:*?\"<>|)"\
+                            + "·출력 파일 경로의 부모 폴더에 쓰기 권한이 없다"\
+                            + "·출력 파일 경로에 쓰기 권한이 없다")
 
         return new_output_camera_vmd_path
 
@@ -260,7 +260,7 @@ def is_auto_camera_vmd_output_path(output_camera_vmd_path: str, motion_camera_vm
 
     new_output_camera_vmd_pattern = re.compile(r'^%s_%s(\d+)_%s%s$' % (escaped_motion_camera_vmd_file_name, \
                                                escaped_rep_pmx_file_name, r"_\d{8}_\d{6}", escaped_motion_camera_vmd_ext))
-    
+
     # 自動生成ルールに則ったファイルパスである場合、合致あり
     return re.match(new_output_camera_vmd_pattern, output_camera_vmd_path) is not None
 
