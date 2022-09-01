@@ -18,29 +18,29 @@ TIMER_ID = wx.NewId()
 
 
 class FilePanel(BasePanel):
-    
+
     def __init__(self, frame: wx.Frame, parent: wx.Notebook, tab_idx: int, file_hitories: dict):
         super().__init__(frame, parent, tab_idx)
         self.file_hitories = file_hitories
         self.timer = None
         self.tree_process_dict = {}
 
-        # ファイルセット
+        # 파일セット
         self.file_set = SizingFileSet(frame, self, self.file_hitories, 1)
         self.sizer.Add(self.file_set.set_sizer, 0, wx.ALL, 0)
 
         btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        # 変換前チェックボタン
-        self.check_btn_ctrl = wx.Button(self, wx.ID_ANY, u"変換前チェック", wx.DefaultPosition, wx.Size(200, 50), 0)
-        self.check_btn_ctrl.SetToolTip(u"入力されたファイル情報で処理可能かどうか、チェックを行います。")
+        # 변환前체크ボタン
+        self.check_btn_ctrl = wx.Button(self, wx.ID_ANY, u"변환 전 체크", wx.DefaultPosition, wx.Size(200, 50), 0)
+        self.check_btn_ctrl.SetToolTip(u"입력한 파일 정보로 처리 가능한지 아닌지, 체크를 실시합니다.")
         self.check_btn_ctrl.Bind(wx.EVT_LEFT_DCLICK, self.on_doubleclick)
         self.check_btn_ctrl.Bind(wx.EVT_LEFT_DOWN, self.on_check_click)
         btn_sizer.Add(self.check_btn_ctrl, 0, wx.ALL, 5)
 
-        # 実行ボタン
-        self.exec_btn_ctrl = wx.Button(self, wx.ID_ANY, u"VMDサイジング実行", wx.DefaultPosition, wx.Size(200, 50), 0)
-        self.exec_btn_ctrl.SetToolTip(u"VMDサイジング処理を実行します。")
+        # 실행ボタン
+        self.exec_btn_ctrl = wx.Button(self, wx.ID_ANY, u"VMD 사이징 실행", wx.DefaultPosition, wx.Size(200, 50), 0)
+        self.exec_btn_ctrl.SetToolTip(u"VMD 사이징 처리를 실행합니다.")
         self.exec_btn_ctrl.Bind(wx.EVT_LEFT_DCLICK, self.on_doubleclick)
         self.exec_btn_ctrl.Bind(wx.EVT_LEFT_DOWN, self.on_exec_click)
         btn_sizer.Add(self.exec_btn_ctrl, 0, wx.ALL, 5)
@@ -66,7 +66,7 @@ class FilePanel(BasePanel):
 
         self.now_process_ctrl = StatusCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(20, -1), wx.TE_READONLY | wx.BORDER_NONE | wx.WANTS_CHARS)
         self.now_process_ctrl.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_3DLIGHT))
-        self.now_process_ctrl.SetToolTip(u"現在進んでいるの大まかな処理数です。クリックすると、具体的な処理進捗がダイアログで表示されます。")
+        self.now_process_ctrl.SetToolTip(u"현재 진행되고 있는 것의 대략적인 처리입니다. 클릭하면 구체적인 처리 진척이 대화 상자에서 나타납니다.")
         self.now_process_ctrl.Bind(wx.EVT_LEFT_DOWN, self.show_process_dialog)
         status_sizer.Add(self.now_process_ctrl, 0, wx.ALIGN_LEFT, 5)
 
@@ -76,7 +76,7 @@ class FilePanel(BasePanel):
 
         self.total_process_ctrl = StatusCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size(20, -1), wx.TE_READONLY | wx.BORDER_NONE | wx.WANTS_CHARS)
         self.total_process_ctrl.SetBackgroundColour(wx.SystemSettings.GetColour(wx.SYS_COLOUR_3DLIGHT))
-        self.total_process_ctrl.SetToolTip(u"全体の大まかな処理数です。クリックすると、具体的な処理進捗がダイアログで表示されます。")
+        self.total_process_ctrl.SetToolTip(u"전체의 대략적인 처리입니다. 클릭하면 구체적인 처리 진척이 대화 상자에서 나타납니다.")
         self.total_process_ctrl.Bind(wx.EVT_LEFT_DOWN, self.show_process_dialog)
         status_sizer.Add(self.total_process_ctrl, 0, wx.ALIGN_LEFT, 5)
 
@@ -92,7 +92,7 @@ class FilePanel(BasePanel):
         self.sizer.Add(status_sizer, 0, wx.ALL, 0)
 
         self.fit()
-    
+
     def show_process_dialog(self, event: wx.Event):
         if self.process_dialog:
             # 既にある場合、一旦破棄
@@ -119,26 +119,26 @@ class FilePanel(BasePanel):
         self.file_set.enable()
         self.check_btn_ctrl.Enable()
         self.exec_btn_ctrl.Enable()
-    
+
     def on_doubleclick(self, event: wx.Event):
         self.timer.Stop()
-        logger.warning("ダブルクリックされました。", decoration=MLogger.DECORATION_BOX)
+        logger.warning("더블클릭 했습니다.", decoration=MLogger.DECORATION_BOX)
         event.Skip(False)
         return False
-    
+
     def on_check_click(self, event: wx.Event):
         self.timer = wx.Timer(self, TIMER_ID)
         self.timer.Start(200)
         self.Bind(wx.EVT_TIMER, self.on_check, id=TIMER_ID)
 
-    # 実行前チェック
+    # 실행前체크
     def on_check(self, event: wx.Event):
         self.timer.Stop()
         self.Unbind(wx.EVT_TIMER, id=TIMER_ID)
-        # 出力先をファイルパネルのコンソールに変更
+        # 出力先を파일パネルのコンソールに変更
         sys.stdout = self.console_ctrl
 
-        if self.check_btn_ctrl.GetLabel() == "読み込み処理停止" and self.frame.load_worker:
+        if self.check_btn_ctrl.GetLabel() == "읽기 처리 정지" and self.frame.load_worker:
             # フォーム無効化
             self.disable()
             # 停止状態でボタン押下時、停止
@@ -153,8 +153,8 @@ class FilePanel(BasePanel):
             # プログレス非表示
             self.gauge_ctrl.SetValue(0)
 
-            logger.warning("読み込み処理を中断します。", decoration=MLogger.DECORATION_BOX)
-            
+            logger.warning("읽기 처리를 중단합니다.", decoration=MLogger.DECORATION_BOX)
+
             event.Skip(False)
         elif not self.frame.load_worker:
             # フォーム無効化
@@ -167,12 +167,12 @@ class FilePanel(BasePanel):
             # 履歴保持
             self.save()
 
-            # 一旦読み込み(そのままチェック)
+            # 一旦読み込み(そのまま체크)
             self.frame.load(event, target_idx=0)
-            
+
             event.Skip()
         else:
-            logger.error("まだ処理が実行中です。終了してから再度実行してください。", decoration=MLogger.DECORATION_BOX)
+            logger.error("아직 처리가 진행 중입니다. 종료 후 다시 실행해 주십시오.", decoration=MLogger.DECORATION_BOX)
             event.Skip(False)
 
     def on_exec_click(self, event: wx.Event):
@@ -180,16 +180,16 @@ class FilePanel(BasePanel):
         self.timer.Start(200)
         self.Bind(wx.EVT_TIMER, self.on_exec, id=TIMER_ID)
 
-    # サイジング実行
+    # 사이징실행
     def on_exec(self, event: wx.Event):
         if self.timer:
             self.timer.Stop()
             self.Unbind(wx.EVT_TIMER, id=TIMER_ID)
-            
-        # 出力先をファイルパネルのコンソールに変更
+
+        # 出力先を파일パネルのコンソールに変更
         sys.stdout = self.console_ctrl
 
-        if self.exec_btn_ctrl.GetLabel() == "VMDサイジング停止" and self.frame.worker:
+        if self.exec_btn_ctrl.GetLabel() == "VMD 사이징 중지" and self.frame.worker:
             # フォーム無効化
             self.disable()
             # 停止状態でボタン押下時、停止
@@ -204,8 +204,8 @@ class FilePanel(BasePanel):
             # プログレス非表示
             self.gauge_ctrl.SetValue(0)
 
-            logger.warning("VMDサイジングを中断します。", decoration=MLogger.DECORATION_BOX)
-            
+            logger.warning("VMD 사이징을 중지합니다.", decoration=MLogger.DECORATION_BOX)
+
             event.Skip(False)
         elif not self.frame.worker:
             # フォーム無効化
@@ -218,12 +218,12 @@ class FilePanel(BasePanel):
             # 履歴保持
             self.save()
 
-            # サイジング可否チェックの後に実行
+            # 사이징可否체크の後に실행
             self.frame.load(event, is_exec=True, target_idx=0)
-            
+
             event.Skip()
         else:
-            logger.error("まだ処理が実行中です。終了してから再度実行してください。", decoration=MLogger.DECORATION_BOX)
+            logger.error("아직 처리가 진행 중입니다. 종료 후 다시 실행해 주십시오.", decoration=MLogger.DECORATION_BOX)
             event.Skip(False)
 
     def set_output_vmd_path(self, event, is_force=False):
@@ -254,7 +254,7 @@ class FilePanel(BasePanel):
 class ProcessDialog(wx.Dialog):
 
     def __init__(self, frame: wx.Frame, panel: wx.Panel):
-        super().__init__(frame, id=wx.ID_ANY, title="進捗ダイアログ", pos=(-1, -1), size=(700, 450), style=wx.DEFAULT_DIALOG_STYLE | wx.STAY_ON_TOP)
+        super().__init__(frame, id=wx.ID_ANY, title="진척 다이얼로그", pos=(-1, -1), size=(700, 450), style=wx.DEFAULT_DIALOG_STYLE | wx.STAY_ON_TOP)
 
         self.frame = frame
         self.panel = panel
@@ -270,17 +270,17 @@ class ProcessDialog(wx.Dialog):
 
         self.SetSizer(self.sizer)
         self.sizer.Layout()
-        
+
         # 画面中央に表示
         self.CentreOnScreen()
-        
+
         # 最初は隠しておく
         self.Hide()
 
     # 初期化
     def initialize(self, tree_dict: dict):
         # Root
-        tr_root_ctrl = self.tree_ctrl.AddRoot(text="VMDサイジング")
+        tr_root_ctrl = self.tree_ctrl.AddRoot(text="VMD 사이징")
 
         # ツリー追加
         self.append_tree(tree_dict, tr_root_ctrl)
@@ -289,7 +289,7 @@ class ProcessDialog(wx.Dialog):
     def append_tree(self, item_dict: dict, parent_ctrl: TreeItemId):
         for tk, tv in item_dict.items():
             if isinstance(tv, bool) and tv:
-                # 処理が終了している場合、アイコン追加
+                # 처리が終了している場合、アイコン追加
                 display_ctrl = self.tree_ctrl.AppendItem(parent=parent_ctrl, text=("○ {0}".format(tk)))
                 self.tree_ctrl.SetItemTextColour(display_ctrl, "BLUE")
             elif isinstance(tv, bool) and not tv:
@@ -302,6 +302,6 @@ class ProcessDialog(wx.Dialog):
             if isinstance(tv, dict):
                 # 下位が辞書の場合、ループ再帰
                 self.append_tree(tv, display_ctrl)
-            
+
         self.tree_ctrl.ExpandAllChildren(parent_ctrl)
 
