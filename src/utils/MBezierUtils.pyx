@@ -6,8 +6,11 @@ import numpy as np
 cimport numpy as np
 import ctypes
 
-import bezier
-cimport bezier._curve
+import ctypes
+ctypes.cdll.LoadLibrary(r"C:\Users\rhs\.conda\envs\vmdsizing_cython\Lib\site-packages\bezier\extra-dll\bezier-2a44d276.dll")
+
+from utils import bezier
+from utils cimport bezier
 
 logger = MLogger(__name__, level=1)
 
@@ -44,7 +47,6 @@ BZ_TYPE_MX = "MX"
 BZ_TYPE_MY = "MY"
 BZ_TYPE_MZ = "MZ"
 BZ_TYPE_R = "R"
-
 
 def from_bz_type(bz_type: str):
     if bz_type == BZ_TYPE_MX:
