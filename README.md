@@ -1,6 +1,6 @@
 # VMD Sizing
 
-DL Link: https://bowlroll.net/file/284302
+DL Link: https://bowlroll.net/file/284414
 
 ## Dependencies
 
@@ -10,4 +10,4 @@ DL Link: https://bowlroll.net/file/284302
  - [bezier](https://pypi.org/project/bezier/)
 
 
-All copyright is belonged to miu200521358
+All copyright is belong to miu200521358
