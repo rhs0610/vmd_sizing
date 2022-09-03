@@ -23,7 +23,7 @@ class CameraPanel(BasePanel):
         self.header_sizer = wx.BoxSizer(wx.VERTICAL)
 
         self.description_txt = wx.StaticText(self.header_panel, wx.ID_ANY, u"지정된 카메라 모션의 사이징을, 본 모션의 사이징과 동시에 실시할 수 있습니다.\n" \
-                                             + "전체 길이 오프닝 Y는 카메라에 비춘 변환용 모링의 전체 길이를 조정하는 오프셋 값을 지정할 수 있습니다. ", wx.DefaultPosition, wx.DefaultSize, 0)
+                                             + "전체 길이 오프셋 Y는 카메라에 비춘 변환용 모링의 전체 길이를 조정하는 오프셋 값을 지정할 수 있습니다. ", wx.DefaultPosition, wx.DefaultSize, 0)
         self.header_sizer.Add(self.description_txt, 0, wx.ALL, 5)
 
         self.static_line01 = wx.StaticLine(self.header_panel, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.LI_HORIZONTAL)

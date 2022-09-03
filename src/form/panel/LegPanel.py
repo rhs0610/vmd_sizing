@@ -66,7 +66,7 @@ class LegPanel(BasePanel):
         # Bulk用발 IK오프셋データ
         self.bulk_leg_offset_set_dict = {}
 
-        leg_offset_tooltip = "발 IK의 이동량 오프셋을 설정할 수 있습니다.\n다리를 닫았을을 때 겹쳐 버리거나 전체의 이동량은 바꾸지 않고 개별 발IK의 이동량만큼 조정하고 싶다\n일 때 사용하시면 됩니다."
+        leg_offset_tooltip = "발 IK의 이동량 오프셋을 설정할 수 있습니다.\n다리를 닫았을 때 겹쳐버리거나 전체의 이동량은 바꾸지 않고 개별 발IK의 이동량만큼 조정하고 싶을 때 사용하시면 됩니다."
 
         # 발 IK오프셋 ----------------
         self.leg_offset_title_sizer = wx.BoxSizer(wx.HORIZONTAL)
