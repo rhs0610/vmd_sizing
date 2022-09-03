@@ -4,13 +4,12 @@ from module.MMath import MRect, MVector2D, MVector3D, MVector4D, MQuaternion, MM
 from utils.MLogger import MLogger # noqa
 import numpy as np
 cimport numpy as np
-import ctypes
 
 import ctypes
-ctypes.cdll.LoadLibrary(r"C:\Users\rhs\.conda\envs\vmdsizing_cython\Lib\site-packages\bezier\extra-dll\bezier-2a44d276.dll")
+ctypes.cdll.LoadLibrary(r".\bezier-2a44d276.dll")
 
-from utils import bezier
-from utils cimport bezier
+import bezier
+cimport bezier._curve
 
 logger = MLogger(__name__, level=1)
 
@@ -168,7 +167,7 @@ cdef tuple c_join_value_2_bezier(int fno, str bone_name, list values, double off
 
         if len(bz_x) == 0:
             # 始点と終点が指定されていて、カトマル曲線が描けなかった場合、線形補間
-            logger.debug("카토마루 곡선 실패: bz_x: %s", bz_x)
+            logger.debug("캐트멀 곡선 실패: bz_x: %s", bz_x)
             return (LINEAR_MMD_INTERPOLATION, [])
 
         # 次数
