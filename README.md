@@ -10,4 +10,4 @@ DL Link: https://bowlroll.net/file/284414
  - [bezier](https://pypi.org/project/bezier/)
 
 
-All copyright belong to miu200521358
+All copyrights belong to miu200521358
